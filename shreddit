@@ -10,7 +10,7 @@ from re import sub
 try:
 	from loremipsum import get_sentence
 except:
-	get_sentence = lambda: '''I have been Shreddited for privacy!\nhttps://github.com/x89/Shreddit/'''
+	get_sentence = lambda: '''I have been Shreddited for privacy!\n\nhttps://github.com/x89/Shreddit/'''
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--config', help="config file to use instead of shreddit.cfg")
