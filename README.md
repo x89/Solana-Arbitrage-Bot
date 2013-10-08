@@ -3,10 +3,10 @@ Shreddit
 
 Details
 -----------
-Shreddit is a Python command line program which will take a user's post history on the website Reddit (http://reddit.com) and after having the user edit a config file will systematically go through the user's history deleting one post/submission at a time utnil only those whitelisted remain.
+Shreddit is a ~~Python command line~~  Lisp program which will take a user's post history on the website Reddit (http://reddit.com) and after having the user edit a config file will systematically go through the user's history deleting one post/submission at a time utnil only those whitelisted remain.
 Note: When it became known that post edits were *not* saved but post deletions *were* saved code was added to edit your post prior to deletion. In fact you can actually turn off deletion all together and just have lorem ipsum (or a message about Shreddit) but this will increase how long it takes the script to run as it will be going over all of your messages every run!
 Basically it lets you maintain your normal reddit account while having your history scrubbed after a certain amount of time.
-Uses PRAW over at https://github.com/praw-dev/praw to do all the heavy lifting.
+Doesn't use PRAW over at https://github.com/praw-dev/praw to do all the heavy lifting.
 
 Usage
 -----------
@@ -16,7 +16,7 @@ Usage
 
 Tit-bits
 -----------
-- If you fill in your user/passwd in your reddit.cfg then you won't be asked for login details when you run the program! Otherwise you'll be prompted every time.
+- If you fill in your user/passwd in your reddit.cfg then you won't be asked for login details when you run the program! Otherwise you'll be prompted every time.`
 
 Cron examples
 -----------
@@ -40,4 +40,4 @@ Caveats
 
 Donations
 ----------
-My Bitcoin address: 17x7Zp3SKGMJu7S3MGa5ktKVDj4ZVAqB14
+~~My~~ Bitcoin address: 17x7Zp3SKGMJu7S3MGa5ktKVDj4ZVAqB14
