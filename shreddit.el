@@ -22,9 +22,6 @@
      (goto-char (+ url-http-end-of-headers 1))
      (json-read-object))))
 
-(defun switch-to-url-buffer (status)
-  (switch-to-buffer (current-buffer)))
-
 (defun login (username password)
   (cdaddr
    (cadar
@@ -57,7 +54,7 @@
 
 (defun delete-all-comments (username password)
   (let ((modhash (login username password)))
-    (mapcar (lambda (x) (delete-comment x modhash)))))
+    (mapcar (lambda (x) (delete-comment x modhash)) (get-comment-ids username))))
 
 
 
