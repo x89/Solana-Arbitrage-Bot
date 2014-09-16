@@ -7,7 +7,7 @@
         (parameters (list (cons "api_type" "json")
                           (cons "user"  username)
                           (cons "passwd" password))))
-    (drakma:http-request "http://www.reddit.com/api/login" :method :post :parameters parameters
+    (drakma:http-request "https://www.reddit.com/api/login" :method :post :parameters parameters
                          :cookie-jar cookie-jar)
     cookie-jar))
 
@@ -15,13 +15,13 @@
   "Always write your code in the clearest way possible"
   (cdr (assoc :modhash
               (cdr (assoc :data
-                          (json:decode-json-from-string (trivial-utf-8:utf-8-bytes-to-string (drakma:http-request "http://www.reddit.com/api/me.json" :cookie-jar cookie))))))))
+                          (json:decode-json-from-string (trivial-utf-8:utf-8-bytes-to-string (drakma:http-request "https://www.reddit.com/api/me.json" :cookie-jar cookie))))))))
 
 (defun get-comment-ids (comments)
   (mapcar (lambda (x) (cdr (assoc :name (cdr (assoc :data x))))) (cdr (assoc :children (cdr (assoc :data comments))))))
 
 (defun get-all-comments (username)
-  (json:decode-json-from-string  (trivial-utf-8:utf-8-bytes-to-string (drakma:http-request (format nil "http://www.reddit.com/user/~a/comments.json" username)))))
+  (json:decode-json-from-string  (trivial-utf-8:utf-8-bytes-to-string (drakma:http-request (format nil "https://www.reddit.com/user/~a/comments.json" username)))))
 
 (defun edit-comment (comment-id text &key (username nil) (password nil) (cookie nil) (modhash nil))
   (let* ((cookie  (if (null cookie)
@@ -30,7 +30,7 @@
          (modhash (if (null modhash)
                       (get-modhash cookie)
                       modhash)))
-    (drakma:http-request "http://www.reddit.com/api/editusertext"
+    (drakma:http-request "https://www.reddit.com/api/editusertext"
                          :method :post
                          :parameters (list (cons "api_type" "json")
                                            (cons "text" text)
@@ -45,7 +45,7 @@
          (modhash (if (null modhash)
                       (get-modhash cookie)
                       modhash)))
-    (drakma:http-request "http://www.reddit.com/api/del"
+    (drakma:http-request "https://www.reddit.com/api/del"
                          :method :post
                          :parameters (list (cons "thing_id" comment-id)
                                            (cons "uh" modhash))
