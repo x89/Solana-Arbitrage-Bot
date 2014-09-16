@@ -1,5 +1,6 @@
 (ql:quickload "drakma")
 (ql:quickload "cl-json")
+(ql:quickload "trivial-utf-8")
 
 (defun get-cookie-jar (username password)
   (let ((cookie-jar (make-instance 'drakma:cookie-jar))
@@ -14,13 +15,13 @@
   "Always write your code in the clearest way possible"
   (cdr (assoc :modhash
               (cdr (assoc :data
-                          (json:decode-json-from-string (drakma:http-request "http://www.reddit.com/api/me.json" :cookie-jar cookie)))))))
+                          (json:decode-json-from-string (trivial-utf-8:utf-8-bytes-to-string (drakma:http-request "http://www.reddit.com/api/me.json" :cookie-jar cookie))))))))
 
 (defun get-comment-ids (comments)
   (mapcar (lambda (x) (cdr (assoc :name (cdr (assoc :data x))))) (cdr (assoc :children (cdr (assoc :data comments))))))
 
 (defun get-all-comments (username)
-  (json:decode-json-from-string  (drakma:http-request (format nil "http://www.reddit.com/user/~a/comments.json" username))))
+  (json:decode-json-from-string  (trivial-utf-8:utf-8-bytes-to-string (drakma:http-request (format nil "http://www.reddit.com/user/~a/comments.json" username)))))
 
 (defun edit-comment (comment-id text &key (username nil) (password nil) (cookie nil) (modhash nil))
   (let* ((cookie  (if (null cookie)
