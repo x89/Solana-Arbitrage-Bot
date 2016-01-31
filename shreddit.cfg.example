@@ -3,7 +3,7 @@
 # Login details for Reddit. Fill out if you don't wish
 # to be prompted for a login every time you run Shreddit.
 ### NOTE: This may be deprecated as you can specify in praw.ini instead
-username = 
+username =
 password =
 
 # How many hours of comments you want to keep
@@ -13,6 +13,10 @@ password =
 # 720 hours in a month (30 days),
 # 8766 hours in a year (365.25 days)
 hours = 24
+
+# Continue looping through all post history
+# default stops at 100 items
+continue_loop = False
 
 # Options: new, top, controversial, more?
 sort = new
@@ -26,7 +30,7 @@ clear_vote = False
 # Options: comments, submitted, overview
 # See: https://github.com/mellort/reddit_api/blob/master/reddit/objects.py#L359
 # Overview: both submissions and comments. Comments / Submitted are as expected.
-item = overview 
+item = overview
 
 # Anything in this list won't be deleted, coma delimited
 # spaces should work as .strip() is called after splitting
@@ -34,7 +38,7 @@ item = overview
 whitelist = AskScience, TheCulture, redditdev, programming, charity
 
 # If you want any specific posts to be whitelisted stick 'em in here
-whitelist_ids =  
+whitelist_ids =
 
 # If you set this then no editing or deleting will be done
 # but the output from the program will be shown as an example
@@ -60,6 +64,6 @@ nuke_hours = 0
 max_score =
 
 # Save JSON encoded comment to this directory before deleting it.
-save_directory = 
+save_directory =
 
 # vim: syntax=config
