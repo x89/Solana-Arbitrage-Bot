@@ -195,5 +195,5 @@ def remove_things(things):
 
 while True:
     items_left = remove_things(get_things())
-    if !items_left || !continue_loop:
+    if not items_left or not continue_loop:
         break;
