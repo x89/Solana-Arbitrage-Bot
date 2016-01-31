@@ -189,5 +189,9 @@ def remove_things(things):
             thing.edit(replacement_text)
         if not edit_only:
             thing.delete()
+            return True
+    return False
 
-remove_things(get_things())
+continue_loop = True
+while continue_loop:
+    continue_loop = remove_things(get_things())
