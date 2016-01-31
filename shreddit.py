@@ -64,6 +64,7 @@ item = config.get('main', 'item')
 whitelist_distinguished = config.getboolean('main', 'whitelist_distinguished')
 whitelist_gilded = config.getboolean('main', 'whitelist_gilded')
 nuke_hours = config.getint('main', 'nuke_hours')
+continue_loop = config.getboolean('main', 'continue_loop')
 try:
     max_score = config.getint('main', 'max_score')
 except ValueError:
@@ -189,5 +190,10 @@ def remove_things(things):
             thing.edit(replacement_text)
         if not edit_only:
             thing.delete()
+            return True
+    return False
 
-remove_things(get_things())
+while True:
+    items_left = remove_things(get_things())
+    if not items_left or not continue_loop:
+        break;
