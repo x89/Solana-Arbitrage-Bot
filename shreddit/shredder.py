@@ -33,6 +33,7 @@ class Shredder(object):
         self._recent_cutoff = arrow.now().replace(hours=-self._hours)
         self._nuke_cutoff = arrow.now().replace(hours=-self._nuke_hours)
         if self._save_directory:
+            self._save_directory = os.path.expanduser(self._save_directory)
             if not os.path.exists(self._save_directory):
                 os.makedirs(self._save_directory)
 
