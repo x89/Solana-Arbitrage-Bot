@@ -113,6 +113,10 @@ class Shredder(object):
         self._logger.info("Deleting submission: #{id} {url}".format(id=sub.id, url=sub.url.encode("utf-8")))
 
     def _remove_comment(self, comment):
+        if self._replacement_format == "original":
+            self._logger.debug("Deleting /r/{}/ #{}".format(comment.subreddit, comment.id))
+            return
+
         if self._replacement_format == "random":
             replacement_text = get_sentence()
         elif self._replacement_format == "dot":

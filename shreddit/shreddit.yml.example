@@ -64,7 +64,9 @@ save_directory: /tmp
 # Defines what you want to edit deleted content with pre-deletion (to ensure
 # it's not saved in their database).
 # Default: Random string. But this can be detected as spam in some cases.
-# options: [random, dot, "user entered string"]
+# options: [random, dot, original, "user entered string"]
+# Use the original option to keep the original content. This skips replacement
+# entirely. **Note: Your comment will still be available in their database**.
 replacement_format: random
 
 # Debug level, how much output you want
