@@ -1,7 +1,3 @@
-This is a fork of the original Shreddit by 'x89'. I maintain this fork with minimal maintenence to ensure that it works correctly without any additional tweaking.
-
-Below you will find the original readme.md.
-
 # Shreddit
 
 Shreddit is a Python command line program which will take a user's post history on the website
