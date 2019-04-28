@@ -1,0 +1,24 @@
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: shreddit
+  namespace: shreddit
+spec:
+  schedule: "00 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: shreddit
+            image: quay.io/ryanbez/shreddit:latest
+            volumeMounts:
+            - name: configs
+              mountPath: "/config"
+              readOnly: true
+          restartPolicy: Never
+          volumes:
+          - name: configs
+            secret:
+              secretName: shreddit-config
