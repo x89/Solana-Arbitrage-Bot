@@ -1,4 +1,4 @@
-iFROM python:alpine
+FROM python:alpine
 
 COPY . /shreddit
 WORKDIR /shreddit
