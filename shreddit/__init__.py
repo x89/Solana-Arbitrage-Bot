@@ -1,6 +1,5 @@
 default_config = {"username": None,
                   "password": None,
-                  "verbose": True,
                   "save_directory": "/tmp",
                   "whitelist": [],
                   "whitelist_ids": [],
@@ -18,5 +17,6 @@ default_config = {"username": None,
                   "trial_run": False,
                   "clear_vote": False,
                   "replacement_format": "random",
+                  "log_level": "DEBUG",
                   "edit_only": False,
                   "batch_cooldown": 10}

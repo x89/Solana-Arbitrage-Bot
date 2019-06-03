@@ -13,9 +13,6 @@ max_score: 100
 # Options: new, top, controversial, more?
 sort: new
 
-# Enables print statements to notify you of what's going on
-verbose: True
-
 # Removes your vote before deleting the item
 clear_vote: False
 
@@ -67,9 +64,9 @@ save_directory: /tmp
 # options: [random, dot, "user entered string"]
 replacement_format: random
 
-# Debug level, how much output you want
+# Logging level, how much output you want
 # See: https://docs.python.org/3/library/logging.html#logging-levels
-debug: DEBUG
+log_level: DEBUG
 
 # Define your own wordlist to use as substitution text when
 # replacement_format == random

@@ -21,7 +21,7 @@ class Shredder(object):
     def __init__(self, config, user):
         logging.basicConfig()
         self._logger = logging.getLogger("shreddit")
-        self._logger.setLevel(level=logging.DEBUG if config.get("verbose", True) else logging.INFO)
+        self._logger.setLevel(level=config.get("log_level", 'DEBUG').upper())
         self.__dict__.update({"_{}".format(k): config[k] for k in config})
 
         self._user = user
