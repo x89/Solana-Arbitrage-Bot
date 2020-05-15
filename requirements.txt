@@ -1,5 +1,5 @@
 <<<<<<< HEAD
-arrow==0.9.0
+arrow>=0.9.0
 decorator==4.0.10
 praw==4.2.0
 PyYAML==3.12
