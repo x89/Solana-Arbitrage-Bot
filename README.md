@@ -57,7 +57,7 @@ client ID and secret, follow these steps (taken from
 [PRAW documentation](http://praw.readthedocs.io/en/latest/getting_started/authentication.html#script-application)):
 
 1. Open your Reddit application preferences by clicking [here](https://www.reddit.com/prefs/apps/).
-2. Add a new application. It doesn't matter what it's named, but calling it "shreddit" makes it easier to remember.
+2. Add a new application. It doesn't matter what it's named.
 3. Select "script".
 4. Redirect URL does not matter for script applications, so enter something like http://127.0.0.1:8080
 5. Once created, you should see the name of your application followed by 14 character string. Enter this 14 character
