@@ -30,8 +30,8 @@ class Shredder(object):
         if self._save_directory:
             self._r.config.store_json_result = True
 
-        self._recent_cutoff = arrow.now().replace(hours=-self._hours)
-        self._nuke_cutoff = arrow.now().replace(hours=-self._nuke_hours)
+        self._recent_cutoff = arrow.now().shift(hours=-self._hours)
+        self._nuke_cutoff = arrow.now().shift(hours=-self._nuke_hours)
         if self._save_directory:
             if not os.path.exists(self._save_directory):
                 os.makedirs(self._save_directory)
