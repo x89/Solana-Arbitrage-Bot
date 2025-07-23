@@ -1,0 +1,17 @@
+[package]
+name = "meteora-damm-cpi"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+no-entrypoint = []
+no-idl = []
+cpi = ["no-entrypoint"]
+
+[dependencies]
+anchor-gen = { git = "https://github.com/OliverNChalk/anchor-gen" }
+anchor-lang = "0.29.0"
+hexlit = "0.5.5"
+
+[package.metadata.cargo-machete]
+ignored = ["anchor-lang"]

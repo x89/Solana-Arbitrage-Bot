@@ -1,0 +1,140 @@
+{
+  "version": "0.7.2",
+  "name": "vault",
+  "docs": ["Program for vault"],
+  "instructions": [],
+  "accounts": [
+    {
+      "name": "Vault",
+      "docs": ["Vault struct"],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "enabled",
+            "docs": [
+              "The flag, if admin set enable = false, then the user can only withdraw and cannot deposit in the vault."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "bumps",
+            "docs": ["Vault nonce, to create vault seeds"],
+            "type": {
+              "defined": "VaultBumps"
+            }
+          },
+          {
+            "name": "totalAmount",
+            "docs": [
+              "The total liquidity of the vault, including remaining tokens in token_vault and the liquidity in all strategies."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "tokenVault",
+            "docs": ["Token account, hold liquidity in vault reserve"],
+            "type": "publicKey"
+          },
+          {
+            "name": "feeVault",
+            "docs": [
+              "Hold lp token of vault, each time rebalance crank is called, vault calculate performance fee and mint corresponding lp token amount to fee_vault. fee_vault is owned by treasury address"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenMint",
+            "docs": ["Token mint that vault supports"],
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "docs": ["Lp mint of vault"],
+            "type": "publicKey"
+          },
+          {
+            "name": "strategies",
+            "docs": [
+              "The list of strategy addresses that vault supports, vault can support up to MAX_STRATEGY strategies at the same time."
+            ],
+            "type": {
+              "array": ["publicKey", 30]
+            }
+          },
+          {
+            "name": "base",
+            "docs": ["The base address to create vault seeds"],
+            "type": "publicKey"
+          },
+          {
+            "name": "admin",
+            "docs": ["Admin of vault"],
+            "type": "publicKey"
+          },
+          {
+            "name": "operator",
+            "docs": [
+              "Person who can send the crank. Operator can only send liquidity to strategies that admin defined, and claim reward to account of treasury address"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "lockedProfitTracker",
+            "docs": ["Stores information for locked profit."],
+            "type": {
+              "defined": "LockedProfitTracker"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "VaultBumps",
+      "docs": ["Vault bumps struct"],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "vaultBump",
+            "docs": ["vault_bump"],
+            "type": "u8"
+          },
+          {
+            "name": "tokenVaultBump",
+            "docs": ["token_vault_bump"],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LockedProfitTracker",
+      "docs": ["LockedProfitTracker struct"],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lastUpdatedLockedProfit",
+            "docs": ["The total locked profit from the last report"],
+            "type": "u64"
+          },
+          {
+            "name": "lastReport",
+            "docs": ["The last timestamp (in seconds) rebalancing"],
+            "type": "u64"
+          },
+          {
+            "name": "lockedProfitDegradation",
+            "docs": ["Rate per second of degradation"],
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "events": [],
+  "errors": []
+}
