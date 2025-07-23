@@ -1,0 +1,45 @@
+# Example configuration file for simplified onchain bot
+
+[bot]
+# Max compute unit limit per transaction
+compute_unit_limit = 600000
+
+[routing]
+# Configuration for each mint to process
+[[routing.mint_config_list]]
+mint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"                # USDC
+pump_pool_list = ["Gf7sXMoP8iRw4iiXmJ1nq4vxcRycbGXy5RL8a8LnTd3v"]
+raydium_pool_list = ["58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2"]
+meteora_damm_pool_list = []
+meteora_dlmm_pool_list = ["5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6"]
+meteora_damm_v2_pool_list = []
+whirlpool_pool_list = ["Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE"]
+raydium_clmm_pool_list = ["3ucNos4NbumPLZNWztqGHNFFgkHeRMBQAVemeeomsUxv"]
+raydium_cp_pool_list = []
+vertigo_pool_list = [] 
+lookup_table_accounts = ["8HvgxVyd22Jq9mmoojm4Awqw6sbymbF5pwLr8FtvySHs"]
+process_delay = 400
+
+[rpc]
+# RPC URL for the Solana network
+url = "https://api.mainnet-beta.solana.com"
+
+[spam]
+# Enable spam transactions
+enabled = true
+# List of RPC URLs to use for sending transactions
+sending_rpc_urls = [
+  "https://api.mainnet-beta.solana.com",
+]
+# Fixed compute unit price
+compute_unit_price = 1000
+# Maximum retries
+max_retries = 3
+
+[wallet]
+# Private key (can be path or environment variable)
+private_key = ""
+
+[kamino_flashloan]
+# Enable Kamino flashloan
+enabled = true
