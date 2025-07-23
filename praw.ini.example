@@ -1,7 +1,0 @@
-# Credentials go here. Fill out default, or provide one or more names and call shreddit with the -u option to specify
-# which set to use.
-[default]
-client_id=
-client_secret=
-username=
-password=
