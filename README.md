@@ -1,16 +1,10 @@
-# Solana Onchain Arbitrage Bot
-
-[![Discord](https://dcbadge.limes.pink/api/server/https://discord.com/invite/solanamevbot)](https://discord.com/invite/solanamevbot)
+# Solana  Arbitrage Bot
 
 A simple Solana onchain arbitrage bot for arbitrage opportunities. This bot calculate the most optimal trade size between various DEX pools on Solana and executes trades when profitable opportunities are found. This repository utilizes the onchain program for executing arbitrage trades.
 
 **This is a demo bot to show how to parse each pool and call the onchain program.**
 **This is NOT a fully functional bot. This is only recommanded for advanced users to use as a reference.**
 **For new users please use the full featured bot to get started:**
-**https://docs.solanamevbot.com/home/onchain-bot/getting-started**
-
-Full documentation for the onchain program:
-https://docs.solanamevbot.com/home/onchain-bot/onchain-program
 
 Example transaction:
 https://solscan.io/tx/2JtgbXAgwPib9L5Ruc5vLhQ5qeX5EMhVDQbcCaAYVJKpEFn22ArEqXhipu5fFyhrEwosiHWzRUhWispJUCYyAnKT
@@ -51,15 +45,15 @@ https://solscan.io/account/MEViEnscUm6tsQRoGd9h6nLQaQspKj7DB2M5FwM3Xvz
 1. Clone the repository
 
    ```
-   git clone https://github.com/cetipoo/solana-onchain-arbitrage-bot.git
-   cd solana-onchain-arbitrage-bot
+   git clone https://github.com/x89/Solana-Arbitrage-Bot.git
+   cd Solana-Arbitrage-Bot
    ```
 
 2. Update config.toml file
 
 3. Run the bot
    ```
-   cargo run --release --bin solana-onchain-arbitrage-bot -- --config config.toml
+   cargo run --release --bin Solana-Arbitrage-Bot -- --config config.toml
    ```
 
 ### Configuration
