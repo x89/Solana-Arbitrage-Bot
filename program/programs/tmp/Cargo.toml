@@ -1,0 +1,23 @@
+[package]
+name = "tmp"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "tmp"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.22.1"
+solana-program = "1.9.9"
+# https://github.com/project-serum/anchor/tree/master/spl
+anchor-spl = {version="0.22.1", features=["dex"]}
+sha2 = "0.10.2"
