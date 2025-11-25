@@ -1,7 +1,7 @@
 # Solana  Arbitrage Bot
 
 A simple Solana onchain arbitrage bot for arbitrage opportunities. This bot calculate the most optimal trade size between various DEX pools on Solana and executes trades when profitable opportunities are found. This repository utilizes the onchain program for executing arbitrage trades.
-Bot was hosted in [TradoxVPS](https://tradoxvps.com)  
+The bot is running on [TradoxVPS](https://tradoxvps.com)  
 
 **This is a demo bot to show how to parse each pool and call the onchain program.**
 **This is NOT a fully functional bot. This is only recommanded for advanced users to use as a reference.**
