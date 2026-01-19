@@ -1,0 +1,72 @@
+[
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "buy",
+    "price": "223.39",
+    "time": "2025-10-09T07:41:06.673-04:00",
+    "TotalTrades": "1",
+    "OrderNumber": "1"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "exit_buy",
+    "price": "224.48",
+    "time": "2025-10-09T07:41:17.328-04:00",
+    "TotalTrades": "2",
+    "sl": "0",
+    "tp": "0",
+    "per": "100"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "sell",
+    "price": "223.47",
+    "time": "2025-10-09T07:41:25.672-04:00",
+    "TotalTrades": "3",
+    "OrderNumber": "1"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "exit_sell",
+    "price": "223.53",
+    "time": "2025-10-09T07:41:36.316-04:00",
+    "TotalTrades": "4",
+    "sl": "0",
+    "tp": "0",
+    "per": "100"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "buy",
+    "price": "221.38",
+    "time": "2025-10-09T11:08:45.364-04:00",
+    "TotalTrades": "5",
+    "OrderNumber": "1"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "buy",
+    "price": "220.32",
+    "time": "2025-10-09T11:26:34.125-04:00",
+    "TotalTrades": "6",
+    "OrderNumber": "2"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "buy",
+    "price": "219.18",
+    "time": "2025-10-09T11:40:25.037-04:00",
+    "TotalTrades": "7",
+    "OrderNumber": "3"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "exit_buy",
+    "price": "224.87",
+    "time": "2025-10-09T18:22:22.962-04:00",
+    "TotalTrades": "8",
+    "sl": "0",
+    "tp": "0",
+    "per": "100"
+  }
+]

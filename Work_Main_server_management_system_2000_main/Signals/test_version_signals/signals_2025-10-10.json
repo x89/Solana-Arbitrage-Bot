@@ -1,0 +1,28 @@
+[
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "sell",
+    "price": "183.7",
+    "time": "2025-10-10T21:56:14.306-04:00",
+    "TotalTrades": "9",
+    "OrderNumber": "1"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "sell",
+    "price": "185.84",
+    "time": "2025-10-10T22:06:43.783-04:00",
+    "TotalTrades": "10",
+    "OrderNumber": "2"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "exit_sell",
+    "price": "185.21",
+    "time": "2025-10-10T22:23:38.609-04:00",
+    "TotalTrades": "11",
+    "sl": "0",
+    "tp": "0",
+    "per": "100"
+  }
+]

@@ -1,0 +1,102 @@
+[
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "buy",
+    "price": "202.15",
+    "time": "2025-09-27T15:48:25.521-04:00",
+    "TotalTrades": "1",
+    "OrderNumber": "1"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "buy",
+    "price": "202.16",
+    "time": "2025-09-27T15:52:30.252-04:00",
+    "TotalTrades": "2",
+    "OrderNumber": "2"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "buy",
+    "price": "202.17",
+    "time": "2025-09-27T15:52:44.502-04:00",
+    "TotalTrades": "3",
+    "OrderNumber": "3"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "exit_buy",
+    "price": "202.23",
+    "time": "2025-09-27T15:52:59.132-04:00",
+    "TotalTrades": "4",
+    "OrderNumber": "3",
+    "sl": "0",
+    "tp": "0",
+    "per": "100"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "buy",
+    "price": "202.14",
+    "time": "2025-09-27T16:14:36.608-04:00",
+    "TotalTrades": "2",
+    "OrderNumber": "2"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "exit_buy",
+    "price": "203.14",
+    "time": "2025-09-27T16:14:48.249-04:00",
+    "TotalTrades": "3",
+    "OrderNumber": "2",
+    "sl": "0",
+    "tp": "0",
+    "per": "100"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "buy",
+    "price": "202.16",
+    "time": "2025-09-27T16:15:01.327-04:00",
+    "TotalTrades": "4",
+    "OrderNumber": "1"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "exit_buy",
+    "price": "202.17",
+    "time": "2025-09-27T16:15:17.811-04:00",
+    "TotalTrades": "5",
+    "OrderNumber": "1",
+    "sl": "0",
+    "tp": "0",
+    "per": "100"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "sell",
+    "price": "202.11",
+    "time": "2025-09-27T16:15:28.878-04:00",
+    "TotalTrades": "6",
+    "OrderNumber": "1"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "sell",
+    "price": "202.1",
+    "time": "2025-09-27T16:15:49.685-04:00",
+    "TotalTrades": "7",
+    "OrderNumber": "2"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "exit_sell",
+    "price": "201.1",
+    "time": "2025-09-27T16:16:00.250-04:00",
+    "TotalTrades": "8",
+    "OrderNumber": "2",
+    "sl": "0",
+    "tp": "0",
+    "per": "100"
+  }
+]

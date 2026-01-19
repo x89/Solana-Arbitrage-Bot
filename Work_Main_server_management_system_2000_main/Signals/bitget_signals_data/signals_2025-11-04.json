@@ -1,0 +1,319 @@
+[
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "buy",
+      "price": "163.44",
+      "time": "2025-11-04T11:11:44.126-04:00",
+      "TotalTrades": "1",
+      "OrderNumber": "1",
+      "account_id": null
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369621392538427392",
+      "message": "Order placed successfully: buy 3.0592266275085658 SOLUSDT at 163.44"
+    },
+    "processed_at": "2025-11-04T09:11:48.003563",
+    "quantity": 3.0592266275085658,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 160.55859733,
+    "required_margin": 65.0,
+    "account_id": "default"
+  },
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "exit_buy",
+      "price": "163.6",
+      "time": "2025-11-04T11:12:40.673-04:00",
+      "TotalTrades": "2",
+      "OrderNumber": null,
+      "account_id": null,
+      "sl": "0",
+      "tp": "0",
+      "per": "100"
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369621632020602880",
+      "message": "Order placed successfully: exit_buy 3.0 SOLUSDT at 163.6"
+    },
+    "processed_at": "2025-11-04T09:12:45.094978",
+    "quantity": 3.0,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 135.73671673,
+    "required_margin": 63.804,
+    "account_id": "default"
+  },
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "buy",
+      "price": "163.42",
+      "time": "2025-11-04T11:13:48.814-04:00",
+      "TotalTrades": "3",
+      "OrderNumber": "1",
+      "account_id": null
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369621914871881732",
+      "message": "Order placed successfully: buy 3.059601028025946 SOLUSDT at 163.42"
+    },
+    "processed_at": "2025-11-04T09:13:52.532396",
+    "quantity": 3.059601028025946,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 160.01490913,
+    "required_margin": 65.0,
+    "account_id": "default"
+  },
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "exit_buy",
+      "price": "163.15",
+      "time": "2025-11-04T11:14:32.003-04:00",
+      "TotalTrades": "4",
+      "OrderNumber": null,
+      "account_id": null,
+      "sl": "0",
+      "tp": "0",
+      "per": "100"
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369622100687937538",
+      "message": "Order placed successfully: exit_buy 3.0 SOLUSDT at 163.15"
+    },
+    "processed_at": "2025-11-04T09:14:36.845038",
+    "quantity": 3.0,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 135.23477353,
+    "required_margin": 63.62850000000001,
+    "account_id": "default"
+  },
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "buy",
+      "price": "164.6",
+      "time": "2025-11-04T11:23:38.985-04:00",
+      "TotalTrades": "2",
+      "OrderNumber": "2",
+      "account_id": null
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369624388315865092",
+      "message": "Order placed successfully: buy 3.037667071688943 SOLUSDT at 164.6"
+    },
+    "processed_at": "2025-11-04T09:23:42.259735",
+    "quantity": 3.037667071688943,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 158.49779593,
+    "required_margin": 65.0,
+    "account_id": "default"
+  },
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "exit_buy",
+      "price": "164.72",
+      "time": "2025-11-04T11:24:02.642-04:00",
+      "TotalTrades": "3",
+      "OrderNumber": null,
+      "account_id": null,
+      "sl": "0",
+      "tp": "0",
+      "per": "100"
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369624489721552897",
+      "message": "Order placed successfully: exit_buy 3.0 SOLUSDT at 164.72"
+    },
+    "processed_at": "2025-11-04T09:24:06.423108",
+    "quantity": 3.0,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 133.52077573,
+    "required_margin": 64.2408,
+    "account_id": "default"
+  },
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "sell",
+      "price": "163.8",
+      "time": "2025-11-04T11:31:01.298-04:00",
+      "TotalTrades": "1",
+      "OrderNumber": "1",
+      "account_id": null
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369626246417702915",
+      "message": "Order placed successfully: sell 3.0525030525030523 SOLUSDT at 163.8"
+    },
+    "processed_at": "2025-11-04T09:31:05.298145",
+    "quantity": 3.0525030525030523,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 158.47511353,
+    "required_margin": 65.0,
+    "account_id": "default"
+  },
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "sell",
+      "price": "163.73",
+      "time": "2025-11-04T11:31:42.813-04:00",
+      "TotalTrades": "2",
+      "OrderNumber": "2",
+      "account_id": null
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369626418119925761",
+      "message": "Order placed successfully: sell 3.053808098699078 SOLUSDT at 163.73"
+    },
+    "processed_at": "2025-11-04T09:31:46.204513",
+    "quantity": 3.053808098699078,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 133.61012173,
+    "required_margin": 65.0,
+    "account_id": "default"
+  },
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "exit_sell",
+      "price": "163.49",
+      "time": "2025-11-04T11:32:52.597-04:00",
+      "TotalTrades": "3",
+      "OrderNumber": null,
+      "account_id": null,
+      "sl": "0",
+      "tp": "0",
+      "per": "100"
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369626712773976070",
+      "message": "Order placed successfully: exit_sell 6.0 SOLUSDT at 163.49"
+    },
+    "processed_at": "2025-11-04T09:32:56.454230",
+    "quantity": 6.0,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 108.75044293,
+    "required_margin": 127.52220000000001,
+    "account_id": "default"
+  },
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "buy",
+      "price": "162.34",
+      "time": "2025-11-04T11:50:39.702-04:00",
+      "TotalTrades": "4",
+      "OrderNumber": "1",
+      "account_id": null
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369631189887311873",
+      "message": "Order placed successfully: buy 3.0799556486386597 SOLUSDT at 162.34"
+    },
+    "processed_at": "2025-11-04T09:50:43.910210",
+    "quantity": 3.0799556486386597,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 159.57423853,
+    "required_margin": 65.0,
+    "account_id": "default"
+  },
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "exit_buy",
+      "price": "162.44",
+      "time": "2025-11-04T11:50:54.563-04:00",
+      "TotalTrades": "5",
+      "OrderNumber": null,
+      "account_id": null,
+      "sl": "0",
+      "tp": "0",
+      "per": "100"
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369631251661021185",
+      "message": "Order placed successfully: exit_buy 3.0 SOLUSDT at 162.44"
+    },
+    "processed_at": "2025-11-04T09:50:58.626400",
+    "quantity": 3.0,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 134.94286693,
+    "required_margin": 63.351600000000005,
+    "account_id": "default"
+  },
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "buy",
+      "price": "161.73",
+      "time": "2025-11-04T11:52:34.501-04:00",
+      "TotalTrades": "1",
+      "OrderNumber": "1",
+      "account_id": null
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369631667018752001",
+      "message": "Order placed successfully: buy 6.183144747418537 SOLUSDT at 161.73"
+    },
+    "processed_at": "2025-11-04T09:52:37.661344",
+    "quantity": 6.183144747418537,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 158.89715113,
+    "required_margin": 65.0,
+    "account_id": "default"
+  },
+  {
+    "signal": {
+      "ticker": "SOLUSDT.P",
+      "action": "exit_buy",
+      "price": "161.52",
+      "time": "2025-11-04T11:56:21.407-04:00",
+      "TotalTrades": "2",
+      "OrderNumber": null,
+      "account_id": null,
+      "sl": "0",
+      "tp": "0",
+      "per": "100"
+    },
+    "order_result": {
+      "success": true,
+      "order_id": "1369632621302603941",
+      "message": "Order placed successfully: exit_buy 6.1 SOLUSDT at 161.52"
+    },
+    "processed_at": "2025-11-04T09:56:25.188569",
+    "quantity": 6.1,
+    "stop_loss": null,
+    "take_profit": null,
+    "available_balance": 109.01491719,
+    "required_margin": 64.04268,
+    "account_id": "default"
+  }
+]
