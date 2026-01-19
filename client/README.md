@@ -1,3 +1,0 @@
-- run `cargo run --bin main -- --cluster mainnet` 
-- `avm use 0.22.1`
-- `cargo test` to run test the spot quotes with mainnet forked localvalidaor 
