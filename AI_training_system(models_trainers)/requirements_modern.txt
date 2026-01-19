@@ -1,0 +1,55 @@
+# Modern AI Training System Requirements
+
+# Core ML/DL frameworks
+torch>=2.0.0
+transformers>=4.30.0
+torch-geometric>=2.3.0
+einops>=0.7.0
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+
+# MLOps and Experiment Tracking
+mlflow>=2.8.0
+wandb>=0.15.0
+tensorboard>=2.13.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+polars>=0.19.0  # Fast DataFrame alternative
+
+# Optimization
+optuna>=3.3.0
+ray[tune]>=2.6.0
+
+# Time series specific
+darts>=0.23.0
+tslearn>=0.6.0
+statsforecast>=1.5.0
+
+# Financial data collection
+yfinance>=0.2.0
+
+# LLM Integration for LLM+RL Hybrid
+openai>=1.10.0
+anthropic>=0.15.0  # Alternative LLM provider
+
+# Graph neural networks
+torch-scatter>=2.1.0
+torch-sparse>=0.6.0
+torch-cluster>=1.6.0
+
+# Reinforcement Learning
+gymnasium>=0.29.0
+stable-baselines3>=2.1.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.17.0
+
+# Utilities
+tqdm>=4.66.0
+pyarrow>=13.0.0
+joblib>=1.3.0
+

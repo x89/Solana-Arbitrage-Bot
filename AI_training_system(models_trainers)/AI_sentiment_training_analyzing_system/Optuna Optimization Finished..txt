@@ -1,0 +1,95 @@
+Optuna Optimization Finished.
+Number of finished trials: 1000
+Best trial:
+  Value (Max Profit): 271.23
+  Params:
+    Fisher Period: 27
+    Signal Period: 49
+    Stop Loss Pct: 0.0740
+    Take Profit Pct: 0.0250
+Optuna visualization is not available. Install with: pip install optuna-dashboard or plotly.
+
+Optuna Optimization Finished.
+Number of finished trials: 3000
+Best trial:
+  Value (Max Profit): 282.45
+  Params:
+    Fisher Period: 27
+    Signal Period: 42
+    Stop Loss Pct: 0.0610
+    Take Profit Pct: 0.0250
+Optuna visualization is not available. Install with: pip install optuna-dashboard or plotly.
+
+Optuna Optimization Finished.
+Number of finished trials: 3000
+Best trial:
+  Value (Max Profit): 392.79
+  Params:
+    Fisher Period: 69
+    Signal Period: 19
+    Stop Loss Pct: 0.0390
+    Take Profit Pct: 0.0150
+Optuna visualization is not available. Install with: pip install optuna-dashboard or plotly.
+
+Note: Optimized parameters are specific to the historical data used.
+Always validate on out-of-sample data before live trading.
+
+
+Number of finished trials: 3000
+Best trial for Combined Strategy (Fisher, RSI, CCI):
+  Value (Max Profit): 2207.53
+  Params:
+    Fisher Period: 25
+    Fisher Signal Period: 28
+    RSI Period: 8
+    RSI Overbought: 76
+    RSI Oversold: 19
+    CCI Period: 23
+    CCI Level: 123
+    Stop Loss Pct: 0.0480
+    Take Profit Pct: 0.1250
+
+Optuna Optimization Finished.
+Number of finished trials: 3000
+Best trial for Combined Strategy (Fisher, RSI, CCI):
+  Value (Max Profit): 1382.91
+  Params:
+    Fisher Period: 9
+    Fisher Signal Period: 33
+    RSI Period: 20
+    RSI Overbought: 61
+    RSI Oversold: 14
+    CCI Period: 5
+    CCI Level: 109
+    Stop Loss Pct: 0.0910
+    Take Profit Pct: 0.0600
+
+Optuna Optimization Finished.
+Number of finished trials: 10000
+Best trial for Combined Strategy (Fisher, RSI, CCI):
+  Value (Max Profit): 1718.04
+  Params:
+    Fisher Period: 13
+    Fisher Signal Period: 39
+    RSI Period: 10
+    RSI Overbought: 65
+    RSI Oversold: 21
+    CCI Period: 10
+    CCI Level: 96
+    Stop Loss Pct: 0.0720
+    Take Profit Pct: 0.0600
+
+Optuna Optimization Finished.
+Number of finished trials: 10000
+Best trial for Combined Strategy (Fisher, RSI, CCI):
+  Value (Max Profit): 1443.73
+  Params:
+    Fisher Period: 29
+    Fisher Signal Period: 22
+    RSI Period: 23
+    RSI Overbought: 61
+    RSI Oversold: 32
+    CCI Period: 12
+    CCI Level: 111
+    Stop Loss Pct: 0.0720
+    Take Profit Pct: 0.1150

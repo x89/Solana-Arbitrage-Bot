@@ -1,0 +1,100 @@
+# Trading System Configuration
+
+# Symbol and Timeframe
+symbol: "SOLUSDT"
+timeframe: "1m"
+alternative_timeframes: ["5m", "15m", "1h"]
+
+# Risk Management
+initial_capital: 10000.0
+risk_per_trade: 0.02  # 2% of portfolio per trade
+max_position_size: 0.10  # Max 10% of portfolio in single position
+max_daily_loss: 0.05  # 5% max daily loss
+max_drawdown: 0.15  # 15% max drawdown
+
+# Signal Generation
+min_confidence: 0.6  # Minimum confidence for signal
+min_prediction_return: 0.002  # 0.2% minimum predicted return
+confirmation_periods: 3  # Signals must be confirmed
+
+# Model Configuration
+prediction_horizon: 6  # Predict 6 steps ahead
+feature_window: 120  # Use last 120 timesteps as input
+use_ensemble: true  # Use ensemble prediction
+
+# Models with weights (must sum to 1.0)
+models:
+  - name: chronos_t5
+    type: chronos_t5
+    path: "models/chronos_t5.pth"
+    weight: 0.40
+    enabled: true
+  
+  - name: chronos_bolt
+    type: chronos_bolt
+    path: "models/chronos_bolt.pth"
+    weight: 0.30
+    enabled: true
+  
+  - name: timesfm
+    type: timesfm
+    path: "models/timesfm.pth"
+    weight: 0.30
+    enabled: true
+
+# Feature Engineering
+features:
+  # Basic features
+  ohlcv: true
+  returns: true
+  volumes: true
+  
+  # Technical indicators
+  rsi_period: 14
+  macd: true
+  bollinger: true
+  
+  # Order book features (if available)
+  orderbook: false
+  
+  # Time features
+  time_encoding: true
+
+# Inference Settings
+inference:
+  device: "auto"  # auto, cpu, cuda
+  batch_size: 1
+  quantization: false  # INT8 quantization for CPU
+  latency_target_ms: 100
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: "logs/trading.log"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+
+# Monitoring
+monitoring:
+  metrics_interval: 60  # seconds
+  health_check_interval: 30  # seconds
+  alert_on_loss: true
+  alert_threshold: -0.05  # Alert on -5% loss
+
+# Backtesting
+backtest:
+  start_date: "2024-01-01"
+  end_date: "2024-12-31"
+  initial_capital: 10000.0
+  commission: 0.001  # 0.1% per trade
+  slippage: 0.0005  # 0.05% slippage
+
+# Fine-tuning
+fine_tuning:
+  enabled: true
+  schedule: "daily"  # daily, weekly
+  data_days: 7  # Use last N days for fine-tuning
+  learning_rate: 1e-5
+  epochs: 5
+  freeze_base: true  # Freeze base model, fine-tune head only
+

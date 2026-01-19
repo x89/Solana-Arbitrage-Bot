@@ -1,0 +1,20 @@
+[
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "buy",
+    "price": "185.4",
+    "time": "2025-10-30T23:25:01.814-04:00",
+    "TotalTrades": "1",
+    "OrderNumber": "1"
+  },
+  {
+    "ticker": "SOLUSDT.P",
+    "action": "exit_buy",
+    "price": "186.22",
+    "time": "2025-10-30T23:25:26.667-04:00",
+    "TotalTrades": "2",
+    "sl": "0",
+    "tp": "0",
+    "per": "100"
+  }
+]

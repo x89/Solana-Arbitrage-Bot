@@ -1,0 +1,12 @@
+{
+  "path": "E:\\Program Files\\Windows Defender\\Deploying\\data\\patterns",
+  "train": "images/train",
+  "val": "images/val",
+  "nc": 4,
+  "names": [
+    "head_shoulders",
+    "double_top",
+    "double_bottom",
+    "triangle"
+  ]
+}

@@ -1,0 +1,19 @@
+# Core GPU libraries
+pynvml>=11.0.0
+GPUtil>=1.4.0
+torch>=2.0.0
+
+# System monitoring
+psutil>=5.9.0
+
+# Data processing
+numpy>=1.23.0
+pandas>=1.5.0
+
+# Async support (optional)
+asyncio-mqtt>=0.16.0
+
+# Utilities
+tqdm>=4.66.0
+pyyaml>=6.0
+

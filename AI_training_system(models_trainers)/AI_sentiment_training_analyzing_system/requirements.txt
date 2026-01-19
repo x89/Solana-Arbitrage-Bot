@@ -1,0 +1,9 @@
+"""
+Sentiment System Requirements
+"""
+
+transformers>=4.30
+torch>=2.0
+nltk>=3.8
+numpy>=1.20
+

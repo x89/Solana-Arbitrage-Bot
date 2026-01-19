@@ -1,0 +1,54 @@
+# Core dependencies
+torch>=2.0.0
+numpy>=1.20.0
+pandas>=1.5.0
+
+# Model serialization
+joblib>=1.0.0
+# Note: pickle5 is not needed for Python 3.8+ (pickle5 is built-in)
+
+# Machine Learning
+scikit-learn>=1.0.0
+xgboost>=1.5.0
+
+# Data collection (for SPY and market data examples)
+yfinance>=0.2.0
+
+# Deep Learning
+tensorflow>=2.10.0  # Optional, for TensorFlow/Keras models
+keras>=2.10.0  # Optional, for Keras models
+
+# Model optimization
+onnxruntime>=1.10.0  # Optional, for ONNX models
+torchvision>=0.15.0
+
+# Data processing
+scipy>=1.9.0
+statsmodels>=0.13.0
+
+# Utilities
+tqdm>=4.64.0
+pyyaml>=6.0
+
+# Visualization
+matplotlib>=3.5.0
+seaborn>=0.12.0
+
+# Time series
+pytorch-forecasting>=0.10.0  # Optional, for TFT and N-BEATS
+
+# Technical Analysis
+TA-Lib>=0.4.25
+
+# Additional ML libraries
+lightgbm>=3.3.0
+
+# Async HTTP
+aiohttp>=3.8.0
+
+# Time Series Forecasting
+chronos-forecasting>=0.1.0
+
+# Additional utilities
+python-dotenv>=0.21.0
+

@@ -1,0 +1,24 @@
+# Core ML/DL frameworks
+torch>=2.0.0
+numpy>=1.20.0
+
+# System monitoring
+psutil>=5.9.0
+
+# GPU monitoring
+GPUtil>=1.4.0
+pynvml>=11.0.0
+
+# Data processing
+pandas>=1.5.0
+
+# Database
+# sqlite3 is built-in
+
+# Optional: Distributed training
+# nccl (NVIDIA Collective Communications Library)
+# Install separately based on your CUDA version
+
+# Utilities
+# datetime, logging, threading, queue - all built-in
+
