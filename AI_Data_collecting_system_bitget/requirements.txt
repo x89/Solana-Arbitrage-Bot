@@ -1,8 +1,0 @@
-"""
-Requirements for Data Collection System
-"""
-aiohttp>=3.8.0
-pandas>=1.3.0
-asyncio>=3.4.3
-sqlite3
-

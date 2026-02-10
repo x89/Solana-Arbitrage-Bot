@@ -1,3 +1,0 @@
-# Signal Receiver dependencies
-# (minimal dependencies as signals come from internal systems)
-
