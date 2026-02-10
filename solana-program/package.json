@@ -2,7 +2,7 @@
     "dependencies": {
         "@project-serum/anchor": "^0.21.0",
         "@solana/buffer-layout": "^4.0.0",
-        "@solana/spl-token": "~0.2.0",
+        "@solana/spl-token": "~0.4.14",
         "@solana/spl-token-swap": "^0.1.2",
         "decimal.js": "^10.3.1"
     },
