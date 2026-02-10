@@ -1,0 +1,21 @@
+[solana]
+rpc_url = "https://api.mainnet-beta.solana.com"
+ws_url = "wss://api.mainnet-beta.solana.com"
+commitment = "confirmed"
+
+[bot]
+keypair_path = "/path/to/keypair.json"
+profit_threshold = 0.01
+max_position_size = 10000.0
+
+[dexes]
+raydium_program_id = "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R"
+serum_program_id = "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin"
+orca_program_id = "DjVE6JNiYqPL2QXyCUUh8rNjHrbz9hXHNYt99MQ59qw1"
+
+[monitoring]
+dashboard_port = 8080
+update_interval = 60
+
+[logging]
+level = "info"

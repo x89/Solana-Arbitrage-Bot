@@ -1,0 +1,62 @@
+[package]
+name = "client"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "client"
+path = "src/lib.rs"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
+
+[[bin]]
+name = "tmp"
+path = "src/tmp.rs"
+
+[[bin]]
+name = "setup_ata"
+path = "src/setup/setup_ata.rs"
+
+[[bin]]
+name = "setup_open_orders"
+path = "src/setup/setup_open_orders.rs"
+
+[dependencies]
+solana-sdk = "1.9.9"
+anchor-spl = { version = "0.22.1", features = ["dex"] }
+anchor-client = { version = "0.22.0", features = ["debug"] }
+anchor-lang = "0.22.0"
+tmp = { path = "../program/programs/tmp", features = ["no-entrypoint"]}
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+spl-math = { version = "0.1", features = [ "no-entrypoint" ] }
+anyhow = "1.0.55"
+rayon = "1.5.1"
+ordered-float = "2.10.0"
+uint = "0.8"
+arrayref = "0.3.6"
+num_enum = "0.5.4" 
+clap = { version = "3.1.6", features = ["derive"] }
+enum_dispatch = "0.3.7"
+num-derive = "0.3"
+num-traits = "0.2"
+solana-program = "1.9.9"
+spl-token = { version = "3.1.1", features = [ "no-entrypoint" ] }
+thiserror = "1.0"
+arbitrary = { version = "1.0", features = ["derive"], optional = true }
+roots = { version = "0.0.7", optional = true }
+log = "0.4"
+env_logger = "0.9.0"
+indicatif = "0.16.2"
+sha2 = "0.10.2"
+dyn-clone = "1.0"
+lazy_static = "1.4.0"
+
+[dev-dependencies]
+solana-sdk = "1.9.9"
+proptest = "1.0"
+roots = "0.0.7"
+
+[workspace]

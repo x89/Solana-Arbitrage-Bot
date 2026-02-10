@@ -1,0 +1,44 @@
+graph TD
+    A[Entrypoint]
+    B[Instruction Processor]
+    C[State Management]
+    D[DEX Integration Layer]
+    E[Fee Calculator]
+    F[Security Checks]
+
+    A --> B
+    B --> C
+    B --> D
+    B --> E
+    B --> F
+
+    subgraph "Instructions"
+        B --> B1[Initialize Swap State]
+        B --> B2[Execute Arbitrage]
+        B --> B3[Update Pool Data]
+    end
+
+    subgraph "State"
+        C --> C1[SwapState]
+        C --> C2[PoolState]
+    end
+
+    subgraph "DEX Interactions"
+        D --> D1[Orca Swap]
+        D --> D2[Raydium Swap]
+        D --> D3[Meteora Swap]
+        D --> D4[Phoenix Swap]
+        D --> D5[Lifinity Swap]
+        D --> D6[Jupiter Swap]
+    end
+
+    subgraph "Fee Calculation"
+        E --> E1[Calculate Fees]
+        E --> E2[Apply Fee Structure]
+    end
+
+    subgraph "Security"
+        F --> F1[Account Validation]
+        F --> F2[Signer Checks]
+        F --> F3[Reentrancy Guard]
+    end

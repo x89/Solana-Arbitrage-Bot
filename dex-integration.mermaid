@@ -1,0 +1,51 @@
+graph TD
+    A[DEX Integration Layer]
+    B[Orca Integration]
+    C[Raydium Integration]
+    D[Meteora Integration]
+    E[Phoenix Integration]
+    F[Lifinity Integration]
+    G[Jupiter Integration]
+
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    A --> F
+    A --> G
+
+    subgraph "Common Interface"
+        A --> A1[Get Pool Info]
+        A --> A2[Get Quote]
+        A --> A3[Execute Swap]
+    end
+
+    subgraph "Orca Specific"
+        B --> B1[Whirlpool Integration]
+        B --> B2[Constant Product Pools]
+    end
+
+    subgraph "Raydium Specific"
+        C --> C1[Concentrated Liquidity]
+        C --> C2[Stable Pools]
+    end
+
+    subgraph "Meteora Specific"
+        D --> D1[Dynamic Fees]
+        D --> D2[Multi-Asset Pools]
+    end
+
+    subgraph "Phoenix Specific"
+        E --> E1[CLOB Integration]
+        E --> E2[Order Matching]
+    end
+
+    subgraph "Lifinity Specific"
+        F --> F1[AMM Integration]
+        F --> F2[Liquidity Provision]
+    end
+
+    subgraph "Jupiter Specific"
+        G --> G1[Aggregator Integration]
+        G --> G2[Route Optimization]
+    end

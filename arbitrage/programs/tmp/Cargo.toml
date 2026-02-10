@@ -1,0 +1,64 @@
+[package]
+name = "tmp"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "tmp"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.29.0"
+anchor-spl = "0.29.0"
+solana-program = "1.16"
+
+#whirlpool cpi
+#whirlpool-cpi = { git = "https://github.com/orca-so/whirlpool-cpi", branch = "anchor/0.29.0" }
+#ahash = "=0.8.6"
+
+
+#raydium
+raydium-amm-v3 = { git = "https://github.com/raydium-io/raydium-clmm", features = [
+    "no-entrypoint",
+    "cpi",
+] }
+spl-memo = "4.0.0"
+spl-token = "=4.0.0"
+num_enum = "=0.7.1"
+ahash = "=0.8.6"
+
+# Jupiter
+#jupiter-cpi = { git = "https://github.com/jup-ag/jupiter-cpi", rev = "5eb8977" }
+anchor-gen = { git = "https://github.com/jup-ag/anchor-gen.git", rev = "dae4c216b883ea089432ff5c00d100f4f662fd07" }
+#jupiter-amm-interface = ">=0.2.1"
+rand = "0.8.5"
+
+#meteora
+dlmm = { git = "https://github.com/MeteoraAg/dlmm-sdk/", package = "lb_clmm", rev = "fb350c54ab1d023dc0819d1c4d89e882fabdbf75", features = [
+    "cpi",
+] }
+dynamic-amm = { git = "https://github.com/mercurial-finance/mercurial-dynamic-amm-sdk", features = [
+    "cpi",
+], rev = "7be5237e9d688f83d40df71278fdbd6ec2d42979" }
+
+[dev-dependencies]
+solana-program-test = "1.16.0"
+
+#meteora
+solana-sdk = "1.16.0"
+dynamic-vault = { git = "https://github.com/mercurial-finance/mercurial-dynamic-amm-sdk", features = [
+    "cpi",
+], rev = "7be5237e9d688f83d40df71278fdbd6ec2d42979" }
+bytemuck = { version = "1.13.1", features = ["derive", "min_const_generics"] }
+assert_matches = "1.5.0"
+solana-client = "1.16.0"
+solana-account-decoder = "1.16.0"
+bincode = "1.3.3"

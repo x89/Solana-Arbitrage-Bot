@@ -1,0 +1,33 @@
+graph TD
+    A[Solana Arbitrage Bot] --> B[Token Management]
+    A --> C[DEX Integration]
+    A --> D[Transaction Management]
+    A --> E[Profit Calculation]
+    
+    subgraph "Token Management"
+        B --> B1[Fetch Trending Tokens]
+        B --> B2[USDC Integration]
+        B --> B3[WSOL Integration]
+        B1 --> B4[Jupiter API Integration]
+    end
+    
+    subgraph "DEX Integration"
+        C --> C1[Raydium]
+        C --> C2[Orca]
+        C --> C3[Meteora]
+        C --> C4[Phoenix]
+        C --> C5[Lifinity]
+        C --> C6[Jupiter]
+    end
+    
+    subgraph "Transaction Management"
+        D --> D1[Batch Instructions]
+        D --> D2[Atomic Execution]
+        D --> D3[5-min Update Cycle]
+    end
+    
+    subgraph "Profit Calculation"
+        E --> E1[Fee Calculation]
+        E --> E2[Dynamic Amount]
+        E --> E3[Pre-swap Profit Check]
+    end

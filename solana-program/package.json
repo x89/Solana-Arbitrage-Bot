@@ -1,0 +1,18 @@
+{
+    "dependencies": {
+        "@project-serum/anchor": "^0.21.0",
+        "@solana/buffer-layout": "^4.0.0",
+        "@solana/spl-token": "~0.2.0",
+        "@solana/spl-token-swap": "^0.1.2",
+        "decimal.js": "^10.3.1"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.3.0",
+        "@types/mocha": "^9.1.0",
+        "@types/node": "^17.0.21",
+        "chai": "^4.3.4",
+        "mocha": "^9.0.3",
+        "ts-mocha": "^9.0.2",
+        "typescript": "^4.3.5"
+    }
+}

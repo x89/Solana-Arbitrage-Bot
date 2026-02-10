@@ -1,0 +1,20 @@
+graph TD
+    A[USDC] --> B[AART]
+    A --> C[SOL]
+    A --> D[BTC]
+    A --> E[ETH]
+    B --> C
+    B --> D
+    B --> E
+    C --> D
+    C --> E
+    D --> E
+
+    subgraph "Pool Types"
+        A --> A1[Orca Pool]
+        A --> A2[Raydium Pool]
+        A --> A3[Meteora Pool]
+        A --> A4[Phoenix Pool]
+        A --> A5[Lifinity Pool]
+        A --> A6[Jupiter Pool]
+    end

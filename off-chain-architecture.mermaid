@@ -1,0 +1,38 @@
+graph TD
+    A[Client Application]
+    B[Pool Data Fetcher]
+    C[Arbitrage Opportunity Finder]
+    D[Transaction Builder]
+    E[Transaction Submitter]
+    F[Result Analyzer]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> A
+
+    subgraph "Pool Data Management"
+        B --> B1[Orca Pools]
+        B --> B2[Raydium Pools]
+        B --> B3[Meteora Pools]
+        B --> B4[Phoenix Pools]
+        B --> B5[Lifinity Pools]
+        B --> B6[Jupiter Pools]
+    end
+
+    subgraph "Opportunity Analysis"
+        C --> C1[Price Discrepancy Detector]
+        C --> C2[Profitability Calculator]
+        C --> C3[Risk Assessor]
+    end
+
+    subgraph "Transaction Handling"
+        D --> D1[Instruction Composer]
+        D --> D2[Account Resolver]
+        E --> E1[RPC Client]
+        E --> E2[Retry Mechanism]
+        F --> F1[Profit/Loss Calculator]
+        F --> F2[Performance Metrics]
+    end

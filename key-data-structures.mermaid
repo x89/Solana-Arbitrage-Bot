@@ -1,0 +1,54 @@
+classDiagram
+    class SwapState {
+        +Pubkey swap_input
+        +bool is_valid
+        +Pubkey input_token
+        +Pubkey current_token
+        +u64 start_balance
+    }
+
+    class ArbitrageStep {
+        <<enumeration>>
+        Orca(u64, u64)
+        Raydium(u64, u64)
+        Meteora(u64, u64)
+        Phoenix(u64, u64)
+        Lifinity(u64, u64)
+        Jupiter(u64, u64)
+    }
+
+    class PoolInfo {
+        +Pubkey address
+        +u8 nonce
+        +Pubkey authority
+        +Pubkey poolTokenMint
+        +u8 poolTokenDecimals
+        +Pubkey feeAccount
+        +Vec<Pubkey> tokenIds
+        +HashMap<Pubkey, TokenInfo> tokens
+        +u8 curveType
+        +FeeStructure feeStructure
+    }
+
+    class TokenInfo {
+        +String tag
+        +String name
+        +Pubkey mint
+        +u8 scale
+        +Pubkey addr
+    }
+
+    class FeeStructure {
+        +Fee traderFee
+        +Fee ownerFee
+    }
+
+    class Fee {
+        +u64 numerator
+        +u64 denominator
+    }
+
+    SwapState "1" -- "*" ArbitrageStep
+    PoolInfo "1" -- "*" TokenInfo
+    PoolInfo "1" -- "1" FeeStructure
+    FeeStructure "1" -- "2" Fee

@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant TokenFetcher
+    participant ProfitCalculator
+    participant BatchBuilder
+    participant Blockchain
+    
+    Client->>TokenFetcher: Start Arbitrage Cycle
+    TokenFetcher->>TokenFetcher: Fetch Trending Tokens
+    loop Every 5 minutes
+        TokenFetcher->>ProfitCalculator: Check Profitable Routes
+        ProfitCalculator->>ProfitCalculator: Calculate Fees
+        ProfitCalculator->>BatchBuilder: Build Transaction
+        BatchBuilder->>BatchBuilder: Create Atomic Instructions
+        BatchBuilder->>Blockchain: Submit Transaction
+        Blockchain-->>Client: Transaction Result
+    end
