@@ -1,0 +1,13 @@
+# Required
+PRIVATE_KEY=
+RPC_URL=
+POOL_ADDRESS=
+TARGET_PRICE=
+MINT_ADDRESS=
+TARGET_ADDRESS=
+
+# Optional
+HTTP_PROXY=<proxy-url>  # Optional: for using a proxy
+UNIT_PRICE=20000       # Optional: default compute unit price
+UNIT_LIMIT=200000      # Optional: default compute unit limit
+TX_SIMULATE=false      # Optional: set to "true" to simulate transactions without sending
