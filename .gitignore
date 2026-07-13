@@ -1,0 +1,7 @@
+.env
+.env.*
+!.env.example
+**/target/
+**/*keypair*.json
+**/id.json
+*.pem

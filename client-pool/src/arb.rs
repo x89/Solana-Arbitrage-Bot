@@ -1,5 +1,4 @@
 use anchor_client::solana_client::rpc_client::RpcClient;
-use anchor_client::solana_client::rpc_config::RpcSendTransactionConfig;
 
 use anchor_client::solana_sdk::pubkey::Pubkey;
 
@@ -198,17 +197,9 @@ impl Arbitrager {
             let res = self.connection.simulate_transaction(&tx).unwrap();
             println!("{:#?}", res);
         } else if self.cluster == Cluster::Mainnet {
-            let signature = self
-                .connection
-                .send_transaction_with_config(
-                    &tx,
-                    RpcSendTransactionConfig {
-                        skip_preflight: true,
-                        ..RpcSendTransactionConfig::default()
-                    },
-                )
-                .unwrap();
-            println!("signature: {:?}", signature);
+            eprintln!(
+                "legacy mainnet submission is disabled; use the solana-mev observe-only monitor"
+            );
         }
     }
 }

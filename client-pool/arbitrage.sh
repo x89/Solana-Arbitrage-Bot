@@ -1,12 +1,6 @@
 #!/bin/sh
-# cargo build --release # re-compile 
+set -eu
 
-rm log.txt # clear the log 
-# continuously search for arbitrages
-while true
-do
-    echo "------" >> log.txt
-    echo $(date) >> log.txt
-    echo "------" >> log.txt
-    ./target/release/main --cluster mainnet >> log.txt 2>&1
-done
+echo "Disabled: the legacy client must not submit mainnet transactions." >&2
+echo "Run the observe-only monitor in ../solana-mev instead." >&2
+exit 1

@@ -40,15 +40,21 @@ pub struct PoolDir {
 }
 
 fn main() {
+    eprintln!("disabled: legacy mainnet account setup is unsafe");
+}
+
+#[allow(dead_code)]
+fn legacy_main() {
     let cluster = Cluster::Mainnet;
 
     env_logger::init();
-    let owner_kp_path = "../../../mainnet.key";     
+    let owner_kp_path =
+        std::env::var("SOLANA_KEYPAIR_PATH").expect("SOLANA_KEYPAIR_PATH is required");
     let owner = read_keypair_file(owner_kp_path.clone()).unwrap();
 
     // ** setup RPC connection 
     let connection = RpcClient::new_with_commitment(
-        "https://ssc-dao.genesysgo.net/",
+        std::env::var("SOLANA_RPC_URL").expect("SOLANA_RPC_URL is required"),
         CommitmentConfig::confirmed()
     );
     let send_tx_connection = RpcClient::new_with_commitment(

@@ -60,20 +60,16 @@ fn main() {
     env_logger::init();
 
     let owner_kp_path = match cluster {
-        Cluster::Localnet => "../../mainnet_fork/localnet_owner.key",
-        Cluster::Mainnet => {
-            "/Users/edgar/.config/solana/uwuU3qc2RwN6CpzfBAhg6wAxiEx138jy5wB3Xvx18Rw.json"
-        }
+        Cluster::Localnet => std::env::var("SOLANA_KEYPAIR_PATH")
+            .unwrap_or_else(|_| "../../mainnet_fork/localnet_owner.key".to_string()),
+        Cluster::Mainnet => std::env::var("SOLANA_KEYPAIR_PATH")
+            .expect("SOLANA_KEYPAIR_PATH is required on mainnet"),
         _ => panic!("shouldnt get here"),
     };
 
     // ** setup RPC connection
-    let connection_url = match cluster {
-        Cluster::Mainnet => {
-            "https://mainnet.rpc.jito.wtf/?access-token=746bee55-1b6f-4130-8347-5e1ea373333f"
-        }
-        _ => cluster.url(),
-    };
+    let connection_url =
+        std::env::var("SOLANA_RPC_URL").unwrap_or_else(|_| cluster.url().to_string());
     info!("using connection: {}", connection_url);
 
     let connection = RpcClient::new_with_commitment(connection_url, CommitmentConfig::confirmed());

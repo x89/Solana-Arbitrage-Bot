@@ -1,6 +1,11 @@
-# anchor_tokenswap
+# Legacy multi-DEX Anchor experiment
 
-- upgrade program: `anchor upgrade --program-id CRQXfRGq3wTkjt7JkqhojPLiKLYLjHPGLebnfiiQB46T ./target/deploy/tmp.so --provider.cluster mainnet --provider.wallet ../../mainnet.key`
-- note to update program 
-    - convert to stable cli: `sh -c "$(curl -sSfL https://release.solana.com/stable/install)"` 
-    - convert back for mainnet forking util: `sh -c "$(curl -sSfL https://release.solana.com/v1.9.13/install)"`
+Do not deploy or upgrade this program. Its placeholder program ID, nested CPI
+account model, and mixed Anchor/Solana dependency graph are not valid for a
+current mainnet deployment.
+
+Anchor 1.0.2 targets Solana 3.1.10, but updating only these version strings is
+unsafe: Raydium, Orca, and Meteora each require a protocol-specific CPI
+migration and current account validation. See `../MIGRATION.md`.
+
+The supported runnable component is `../solana-mev`.

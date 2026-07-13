@@ -1,21 +1,30 @@
-[solana]
-rpc_url = "https://api.mainnet-beta.solana.com"
-ws_url = "wss://api.mainnet-beta.solana.com"
-commitment = "confirmed"
+[jupiter]
+# Jupiter Swap V2 requires an API key from https://portal.jup.ag.
+base_url = "https://api.jup.ag/swap/v2"
+api_key_env = "JUPITER_API_KEY"
+# This is a public wallet address only. The monitor never reads a private key.
+taker_env = "SOLANA_TAKER_PUBKEY"
+request_timeout_ms = 5000
 
-[bot]
-keypair_path = "/path/to/keypair.json"
-profit_threshold = 0.01
-max_position_size = 10000.0
+[scanner]
+interval_ms = 1000
+min_profit_bps = 30
+slippage_bps = 30
+max_accounts = 64
+fast_mode = true
+# Reject a candidate when both legs use any of the same liquidity venues.
+require_different_venues = true
+# Conservative allowance denominated in the start mint's smallest unit.
+# Adjust this for priority fees, tips, and other execution costs.
+estimated_cost_in_start_units = 10000
 
-[dexes]
-raydium_program_id = "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R"
-serum_program_id = "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin"
-orca_program_id = "DjVE6JNiYqPL2QXyCUUh8rNjHrbz9hXHNYt99MQ59qw1"
-
-[monitoring]
-dashboard_port = 8080
-update_interval = 60
-
-[logging]
-level = "info"
+[[routes]]
+name = "USDC-WSOL-USDC"
+start_mint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+intermediate_mint = "So11111111111111111111111111111111111111112"
+# 100 USDC (USDC has 6 decimals).
+amount = 100000000
+# Optional Jupiter DEX labels. Empty means that Jupiter may use any venue.
+forward_dexes = []
+return_dexes = []
+enabled = true

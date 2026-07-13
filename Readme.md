@@ -3,10 +3,18 @@
 
 This is solana flash loan arbitrage bot transaction.(https://solscan.io/tx/2BK4cMrPpmFPDbvwqTWV4Gqgt3Z7hmfi7eszphgdxHAppUVNSWN7uRLnVv6SR82NskUxhK8vdyEEgQGmmQa3MvqH)
 
+## Current status (July 2026)
+
+The canonical runnable component is now [`solana-mev`](solana-mev/README.md),
+a safe dry-run monitor using Jupiter Swap V2. It does not load a private key or
+submit transactions.
+
+The `client-pool`, `arbitrage`, and `solana-program` directories are legacy
+experiments. Their direct DEX account layouts and Anchor dependencies must not
+be deployed without protocol-specific migration and testing. In particular,
+Serum and legacy Orca Token Swap integrations are obsolete.
 
 https://github.com/user-attachments/assets/90e92b23-7517-46b9-95ac-a4d9f1d1da1c
-
-## ✨[📞💻](https://t.me/githubx89)  Don't take this document lightly.
 
 ```
  Message: Message { 
