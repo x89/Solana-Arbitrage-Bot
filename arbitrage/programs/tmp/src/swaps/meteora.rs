@@ -1,7 +1,7 @@
+use crate::state::SwapState;
 use anchor_lang::prelude::*;
 use anchor_spl::token::TokenAccount;
 use solana_program::instruction::{AccountMeta, Instruction};
-use crate::state::SwapState;
 
 pub fn _meteora_swap<'info>(
     ctx: &Context<'_, '_, '_, 'info, MeteoraSwap<'info>>,

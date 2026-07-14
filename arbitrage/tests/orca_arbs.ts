@@ -95,7 +95,7 @@
   
 //   // load the owner of the tokens 
 //   let rawdata = fs.readFileSync(
-//     `/Users/brennan/Documents/workspace/solana/orca_local/env/pools/owner.key`, 
+//     process.env.SOLANA_KEYPAIR_PATH,
 //     'utf8'
 //   );  
 //   let owner_secret = new Uint8Array(JSON.parse(rawdata));
@@ -125,11 +125,11 @@
 //   const orca = orca_root.getOrca(connection, ORCA_TOKENSWAP_ID)
 
 //   // load the pool info for the swap 
-//   var pool_path = '/Users/brennan/Documents/workspace/solana/orca_local/env/pools/params_AB.json'
+//   var pool_path = process.env.LEGACY_ORCA_POOL_AB
 //   const AB_pool_params = decode_poolparams(pool_path)
-//   var pool_path = '/Users/brennan/Documents/workspace/solana/orca_local/env/pools/params_BC.json'
+//   var pool_path = process.env.LEGACY_ORCA_POOL_BC
 //   const BC_pool_params = decode_poolparams(pool_path)
-//   var pool_path = '/Users/brennan/Documents/workspace/solana/orca_local/env/pools/params_CA.json'
+//   var pool_path = process.env.LEGACY_ORCA_POOL_CA
 //   const CA_pool_params = decode_poolparams(pool_path)
 
 //   const pools = [

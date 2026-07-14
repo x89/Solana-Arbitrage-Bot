@@ -14,6 +14,8 @@ not compiled by this crate.
 - No transaction is signed or submitted.
 - A reported candidate is not a profit guarantee.
 - The second quote is requested after the first, so the quotes are not atomic.
+- The return quote uses the forward leg's minimum output, and requests are
+  serialized according to `jupiter.min_request_interval_ms`.
 - Execution must simulate a single composed transaction and include priority
   fees, Jito tips, token transfer fees, and account-rent costs.
 
@@ -41,7 +43,8 @@ cargo run --release
 ```
 
 Configure routes and risk assumptions in `config.toml`. All amounts are integer
-base units; do not use floating-point UI amounts.
+base units; do not use floating-point UI amounts. The per-route cost allowance
+is an operator estimate, not proof that all execution costs are covered.
 
 Useful checks:
 

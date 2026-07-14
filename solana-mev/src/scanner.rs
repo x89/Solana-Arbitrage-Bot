@@ -17,7 +17,8 @@ pub struct Scanner {
 pub struct Evaluation {
     pub route_name: String,
     pub start_amount: u64,
-    pub intermediate_amount: u64,
+    pub expected_intermediate_amount: u64,
+    pub minimum_intermediate_amount: u64,
     pub expected_final_amount: u64,
     pub minimum_final_amount: u64,
     pub estimated_net_profit: i128,
@@ -54,7 +55,7 @@ impl Scanner {
             .quote(self.quote_request(
                 &route.intermediate_mint,
                 &route.start_mint,
-                forward.out_amount,
+                forward.minimum_out_amount,
                 &route.return_dexes,
             ))
             .await
@@ -64,16 +65,16 @@ impl Scanner {
 
         let estimated_net_profit = i128::from(backward.minimum_out_amount)
             - i128::from(route.amount)
-            - i128::from(self.config.estimated_cost_in_start_units);
+            - i128::from(route.estimated_cost_in_start_units);
         let estimated_profit_bps = profit_bps(estimated_net_profit, route.amount);
-        let venues_are_different =
-            venue_sets_are_disjoint(&forward.venue_labels, &backward.venue_labels);
+        let venues_are_different = venue_sets_are_disjoint(&forward.amm_keys, &backward.amm_keys);
         let venue_requirement_met = !self.config.require_different_venues || venues_are_different;
 
         Ok(Evaluation {
             route_name: route.name.clone(),
             start_amount: route.amount,
-            intermediate_amount: forward.out_amount,
+            expected_intermediate_amount: forward.out_amount,
+            minimum_intermediate_amount: forward.minimum_out_amount,
             expected_final_amount: backward.out_amount,
             minimum_final_amount: backward.minimum_out_amount,
             estimated_net_profit,
@@ -81,8 +82,11 @@ impl Scanner {
             forward_venues: forward.venue_labels,
             return_venues: backward.venue_labels,
             venues_are_different,
-            is_opportunity: estimated_profit_bps >= self.config.min_profit_bps
-                && venue_requirement_met,
+            is_opportunity: meets_profit_threshold(
+                estimated_net_profit,
+                route.amount,
+                self.config.min_profit_bps,
+            ) && venue_requirement_met,
         })
     }
 
@@ -112,7 +116,7 @@ fn validate_leg_continuity(route: &RouteConfig, forward: &Quote, backward: &Quot
             && forward.output_mint == route.intermediate_mint
             && backward.input_mint == route.intermediate_mint
             && backward.output_mint == route.start_mint
-            && backward.in_amount == forward.out_amount,
+            && backward.in_amount == forward.minimum_out_amount,
         "Jupiter returned discontinuous route legs for {}",
         route.name
     );
@@ -132,14 +136,29 @@ fn profit_bps(profit: i128, amount: u64) -> i64 {
     bps.clamp(i128::from(i64::MIN), i128::from(i64::MAX)) as i64
 }
 
+fn meets_profit_threshold(profit: i128, amount: u64, minimum_bps: i64) -> bool {
+    profit > 0
+        && profit.saturating_mul(10_000)
+            >= i128::from(amount).saturating_mul(i128::from(minimum_bps))
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{profit_bps, venue_sets_are_disjoint};
+    use super::{meets_profit_threshold, profit_bps, venue_sets_are_disjoint};
 
     #[test]
     fn calculates_positive_and_negative_profit_bps() {
         assert_eq!(profit_bps(500_000, 100_000_000), 50);
         assert_eq!(profit_bps(-250_000, 100_000_000), -25);
+    }
+
+    #[test]
+    fn requires_positive_profit_and_compares_without_rounding() {
+        assert!(!meets_profit_threshold(-1, 100_000_000, 0));
+        assert!(!meets_profit_threshold(0, 100_000_000, 0));
+        assert!(meets_profit_threshold(1, 100_000_000, 0));
+        assert!(!meets_profit_threshold(9_999, 100_000_000, 1));
+        assert!(meets_profit_threshold(10_000, 100_000_000, 1));
     }
 
     #[test]

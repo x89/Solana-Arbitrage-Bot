@@ -1,3 +1,4 @@
+%% LEGACY CONCEPTUAL DESIGN — not the supported solana-mev implementation.
 classDiagram
     class SwapState {
         +Pubkey swap_input
@@ -24,8 +25,8 @@ classDiagram
         +Pubkey poolTokenMint
         +u8 poolTokenDecimals
         +Pubkey feeAccount
-        +Vec<Pubkey> tokenIds
-        +HashMap<Pubkey, TokenInfo> tokens
+        +Vec~Pubkey~ tokenIds
+        +Map~PubkeyToTokenInfo~ tokens
         +u8 curveType
         +FeeStructure feeStructure
     }

@@ -1,17 +1,19 @@
+#![allow(clippy::result_large_err)] // Anchor 0.28's public Result type is large.
+
 // File: src/lib.rs
 
-use anchor_lang::prelude::*;
 use crate::state::RaydiumSwapState;
+use anchor_lang::prelude::*;
 
+pub mod error;
 pub mod ix_data;
 pub mod state;
 pub mod swaps;
-pub mod error;
 
+use swaps::jupiter::*;
+use swaps::meteora::*;
 use swaps::orca::*;
 use swaps::raydium::*;
-use swaps::meteora::*;
-use swaps::jupiter::*;
 
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
@@ -58,7 +60,8 @@ pub mod tmp {
         minimum_amount_out: u64,
         route_data: Vec<u8>,
     ) -> Result<()> {
-        ctx.accounts.process_swap(amount_in, minimum_amount_out, route_data)
+        ctx.accounts
+            .process_swap(amount_in, minimum_amount_out, route_data)
     }
 }
 
@@ -72,9 +75,9 @@ pub struct InitializeRaydiumSwapState<'info> {
         bump
     )]
     pub swap_state: Account<'info, RaydiumSwapState>,
-    
+
     #[account(mut)]
     pub authority: Signer<'info>,
-    
+
     pub system_program: Program<'info, System>,
 }

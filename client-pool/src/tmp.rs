@@ -660,7 +660,6 @@ fn main() {
 
     // hm3.push(2);
 
-    // let pool_directory = "/Users/brennan/Documents/workspace/solana/solana_penguin/mercurial_pools/pools/";
     // // import pool + token information
     // let all_pool_paths = {
     //     let _paths = fs::read_dir(pool_directory).unwrap();

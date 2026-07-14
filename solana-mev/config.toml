@@ -5,6 +5,9 @@ api_key_env = "JUPITER_API_KEY"
 # This is a public wallet address only. The monitor never reads a private key.
 taker_env = "SOLANA_TAKER_PUBKEY"
 request_timeout_ms = 5000
+# Serialize requests to stay below Jupiter Free's documented 1-RPS limit.
+# Paid plans may use a lower value that matches their portal quota.
+min_request_interval_ms = 1100
 
 [scanner]
 interval_ms = 1000
@@ -12,11 +15,8 @@ min_profit_bps = 30
 slippage_bps = 30
 max_accounts = 64
 fast_mode = true
-# Reject a candidate when both legs use any of the same liquidity venues.
+# Reject a candidate when both legs use any of the same AMM/pool accounts.
 require_different_venues = true
-# Conservative allowance denominated in the start mint's smallest unit.
-# Adjust this for priority fees, tips, and other execution costs.
-estimated_cost_in_start_units = 10000
 
 [[routes]]
 name = "USDC-WSOL-USDC"
@@ -24,6 +24,9 @@ start_mint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
 intermediate_mint = "So11111111111111111111111111111111111111112"
 # 100 USDC (USDC has 6 decimals).
 amount = 100000000
+# Example allowance in this route's start-mint base units; it is not a guarantee.
+# Set it from realistic priority fees, tips, transfer fees, rent, and wrapping costs.
+estimated_cost_in_start_units = 10000
 # Optional Jupiter DEX labels. Empty means that Jupiter may use any venue.
 forward_dexes = []
 return_dexes = []

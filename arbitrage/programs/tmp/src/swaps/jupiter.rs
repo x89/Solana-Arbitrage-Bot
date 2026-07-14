@@ -3,9 +3,7 @@ use anchor_lang::solana_program::instruction::Instruction;
 use anchor_spl::token::TokenAccount;
 
 // Import necessary types from jupiter-cpi crate
-use jupiter_cpi::{
-    JupiterIx, JupiterIxParams, JupiterIxResult, Route, SwapMode,
-};
+use jupiter_cpi::{JupiterIx, JupiterIxParams, JupiterIxResult, Route, SwapMode};
 
 pub fn jupiter_swap<'info>(
     ctx: Context<'_, '_, '_, 'info, JupiterSwap<'info>>,

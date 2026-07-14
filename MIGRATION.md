@@ -28,7 +28,7 @@ Legacy Metis Swap V1 and Ultra are superseded by Swap V2. Swap V2 requires an
 API key and uses `bps` as the canonical route split field. The monitor consumes
 the current `/build` response instead of maintaining copied IDLs.
 
-Jupiter Aggregator V6 program:
+Current Jupiter aggregator program address:
 `JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4`.
 
 ### Raydium
@@ -39,7 +39,8 @@ Do not treat one `raydium_program_id` as covering all pools:
 - CPMM: `CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C`
 - CLMM: `CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK`
 
-CPMM is the recommended constant-product integration and supports Token-2022.
+CPMM is the recommended constant-product integration. Its Token-2022 support is
+limited to supported extensions and allowlisted mints.
 The old pool client incorrectly used the associated-token program as its
 Raydium program constant.
 
@@ -64,12 +65,14 @@ OpenBook integration. No Serum account decoder is part of the supported path.
 
 ### Jito
 
-Jito bundle submission remains useful for atomic landing, but it is not an RPC
-URL with a source-controlled access token. The exposed token and absolute
-wallet path were removed from the legacy pool client. The old token should be
-revoked by its owner.
+Jito bundle submission can provide all-or-nothing execution when a bundle lands
+as a bundle; receiving a bundle ID does not guarantee landing, and uncled-block
+handling still matters. Jito is not an RPC URL with a source-controlled access
+token. The exposed token and absolute wallet path were removed from the legacy
+pool client. Repository inspection cannot verify whether the former token was
+revoked, so its owner must confirm revocation separately.
 
-## Legacy workspace build status
+## Legacy workspace build status (verified 2026-07-14)
 
 - `solana-mev`: previously had no Cargo binary/library target; `cargo check`
   only checked dependency resolution. It now has a real `src/` target.
@@ -78,6 +81,13 @@ revoked by its owner.
   producing incompatible `Pubkey` types.
 - `solana-program`: host `cargo check` succeeds on its pinned legacy stack, but
   that does not validate mainnet CPI behavior.
+
+Dependency audits on 2026-07-14 found no RustSec vulnerabilities in the
+supported `solana-mev` monitor. The three legacy Rust lockfiles contain multiple
+known vulnerabilities inherited from obsolete Solana/Anchor stacks, and the
+legacy Node lockfiles also report high/critical advisories. Those workspaces
+must remain quarantined; individual transitive-package bumps cannot make their
+protocol integrations safe.
 
 ## Before adding execution
 

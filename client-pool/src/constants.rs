@@ -5,9 +5,10 @@ lazy_static! {
     pub static ref TOKEN_PROGRAM_ID: Pubkey = Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap();
 
     pub static ref ASSOCIATED_TOKEN_PROGRAM_ID: Pubkey = Pubkey::from_str("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL").unwrap();
-    
-    pub static ref RAYDIUM_PROGRAM_ID: Pubkey = Pubkey::from_str("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL").unwrap();
-    
+
+    // Legacy AMM v4 only; current CPMM and CLMM pools use different programs.
+    pub static ref RAYDIUM_PROGRAM_ID: Pubkey = Pubkey::from_str("675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8").unwrap();
+
     pub static ref ORCA_PROGRAM_ID: Pubkey = Pubkey::from_str("9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP").unwrap();
 
     pub static ref MERCURIAL_PROGRAM_ID: Pubkey = Pubkey::from_str("MERLuDFBMmsHnsBPZw2sDQZHvXFMwp8EdjudcU2HKky").unwrap();

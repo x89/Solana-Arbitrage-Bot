@@ -8,13 +8,13 @@ use clap::Parser;
 use log::{debug, info, warn};
 use reqwest::blocking::get;
 use serde_json::Value;
+use solana_sdk::account::Account;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
-use std::rc::Rc;
-use std::str::FromStr;
-use solana_sdk::account::Account;
 use std::fs::File;
 use std::io::{self, Read};
+use std::rc::Rc;
+use std::str::FromStr;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -37,7 +37,8 @@ fn fetch_tokens() -> Vec<String> {
         .json()
         .expect("Failed to parse JSON");
 
-    response.as_array()
+    response
+        .as_array()
         .expect("Expected an array")
         .iter()
         .filter_map(|token| token.get("address").and_then(Value::as_str))
@@ -67,37 +68,32 @@ fn calculate_fees(amount: u128, fee_percentage: f64) -> u128 {
 fn load_config(file_path: &str) -> Config {
     let mut file = File::open(file_path).expect("Could not open config file");
     let mut contents = String::new();
-    file.read_to_string(&mut contents).expect("Could not read config file");
+    file.read_to_string(&mut contents)
+        .expect("Could not read config file");
     serde_json::from_str(&contents).expect("Could not parse config JSON")
 }
 
 fn main() {
-        // Parse command-line arguments and initialize variables
+    // Parse command-line arguments and initialize variables
     let args = Args::parse();
     let cluster = match args.cluster.as_str() {
         "localnet" => Cluster::Localnet,
         "mainnet" => Cluster::Mainnet,
         _ => panic!("invalid cluster type"),
     };
-     // Initialize logging and other setup
+    // Initialize logging and other setup
     env_logger::init();
     // Fetch token mints from the blockchain
     let config = load_config(&args.config);
-    
-    let owner_kp_path = match cluster {
-        Cluster::Localnet => std::env::var("SOLANA_KEYPAIR_PATH")
-            .unwrap_or_else(|_| "../../mainnet_fork/localnet_owner.key".to_string()),
-        Cluster::Mainnet => std::env::var("SOLANA_KEYPAIR_PATH")
-            .expect("SOLANA_KEYPAIR_PATH is required on mainnet"),
-        _ => panic!("shouldn't get here"),
-    };
+
+    let owner_kp_path =
+        std::env::var("SOLANA_KEYPAIR_PATH").expect("SOLANA_KEYPAIR_PATH is required");
 
     let connection_url =
         std::env::var("SOLANA_RPC_URL").unwrap_or_else(|_| cluster.url().to_string());
-    info!("Using connection: {}", connection_url);
+    info!("Using configured RPC endpoint");
 
-    let connection =
-        RpcClient::new_with_commitment(connection_url, CommitmentConfig::confirmed());
+    let connection = RpcClient::new_with_commitment(connection_url, CommitmentConfig::confirmed());
     let send_tx_connection =
         RpcClient::new_with_commitment(cluster.url(), CommitmentConfig::confirmed());
 
@@ -112,7 +108,7 @@ fn main() {
 
     let mut pool_dirs = vec![];
 
-// Add DEX directories to the pool directories list
+    // Add DEX directories to the pool directories list
     let orca_dir = PoolDir {
         tipe: PoolType::OrcaPoolType,
         dir_path: "../pools/orca".to_string(),
@@ -221,10 +217,12 @@ fn main() {
     info!("Getting pool amounts...");
     let mut update_accounts = vec![];
     for token_addr_chunk in update_pks.chunks(99) {
-        let accounts = connection.get_multiple_accounts(token_addr_chunk).unwrap_or_else(|e| {
-            warn!("Failed to get accounts: {}", e);
-            vec![None; token_addr_chunk.len()]
-        });
+        let accounts = connection
+            .get_multiple_accounts(token_addr_chunk)
+            .unwrap_or_else(|e| {
+                warn!("Failed to get accounts: {}", e);
+                vec![None; token_addr_chunk.len()]
+            });
         update_accounts.push(accounts);
     }
     let mut update_accounts = update_accounts

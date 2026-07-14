@@ -38,11 +38,7 @@ pub struct OrcaSwap<'info> {
 }
 
 impl<'info> OrcaSwap<'info> {
-    pub fn process_swap(
-        &self,
-        amount_in: u64,
-        minimum_amount_out: u64,
-    ) -> Result<()> {
+    pub fn process_swap(&self, amount_in: u64, minimum_amount_out: u64) -> Result<()> {
         let ix_data = {
             let mut data = Vec::with_capacity(32);
             data.extend_from_slice(&[2]); // Swap instruction discriminator

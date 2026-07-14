@@ -57,11 +57,7 @@ pub struct RaydiumSwap<'info> {
 }
 
 impl<'info> RaydiumSwap<'info> {
-    pub fn process_swap(
-        &self,
-        amount_in: u64,
-        minimum_amount_out: u64,
-    ) -> Result<()> {
+    pub fn process_swap(&self, amount_in: u64, minimum_amount_out: u64) -> Result<()> {
         let ix = Instruction {
             program_id: self.amm_id.key(),
             accounts: vec![
@@ -107,13 +103,14 @@ impl<'info> RaydiumSwap<'info> {
                 self.user_authority.to_account_info(),
                 self.token_program.to_account_info(),
             ],
-        ).map_err(|_| ErrorCode::RaydiumSwapFailed)?;
+        )
+        .map_err(|_| ErrorCode::RaydiumSwapFailed)?;
 
         Ok(())
     }
 
     fn build_swap_instruction_data(&self, amount_in: u64, minimum_amount_out: u64) -> Vec<u8> {
-        let mut data = Vec::with_capacity(9);
+        let mut data = Vec::with_capacity(17);
         data.push(9u8); // Swap instruction discriminator
         data.extend_from_slice(&amount_in.to_le_bytes());
         data.extend_from_slice(&minimum_amount_out.to_le_bytes());

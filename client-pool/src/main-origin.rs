@@ -59,18 +59,13 @@ fn main() {
 
     env_logger::init();
 
-    let owner_kp_path = match cluster {
-        Cluster::Localnet => std::env::var("SOLANA_KEYPAIR_PATH")
-            .unwrap_or_else(|_| "../../mainnet_fork/localnet_owner.key".to_string()),
-        Cluster::Mainnet => std::env::var("SOLANA_KEYPAIR_PATH")
-            .expect("SOLANA_KEYPAIR_PATH is required on mainnet"),
-        _ => panic!("shouldnt get here"),
-    };
+    let owner_kp_path =
+        std::env::var("SOLANA_KEYPAIR_PATH").expect("SOLANA_KEYPAIR_PATH is required");
 
     // ** setup RPC connection
     let connection_url =
         std::env::var("SOLANA_RPC_URL").unwrap_or_else(|_| cluster.url().to_string());
-    info!("using connection: {}", connection_url);
+    info!("using configured RPC endpoint");
 
     let connection = RpcClient::new_with_commitment(connection_url, CommitmentConfig::confirmed());
     let send_tx_connection =

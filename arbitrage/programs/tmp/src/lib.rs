@@ -3,16 +3,11 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Token, TokenAccount};
 
-pub mod swaps;
-pub mod state;
 pub mod ix_data;
+pub mod state;
+pub mod swaps;
 
-use crate::swaps::{
-    meteora::*,
-    raydium::*,
-    orca::*,
-    jupiter::*,
-};
+use crate::swaps::{jupiter::*, meteora::*, orca::*, raydium::*};
 
 declare_id!("ArbitrageProgram11111111111111111111111111111111");
 
@@ -50,9 +45,10 @@ pub mod arbitrage {
         )?;
 
         // Verify profit
-        let profit = minimum_final_amount.checked_sub(amount_in)
+        let profit = minimum_final_amount
+            .checked_sub(amount_in)
             .ok_or(ErrorCode::ArithmeticError)?;
-        
+
         require!(
             profit >= ctx.accounts.swap_state.profit_threshold,
             ErrorCode::InsufficientProfit
@@ -91,9 +87,10 @@ pub mod arbitrage {
         )?;
 
         // Verify profit
-        let profit = minimum_final_amount.checked_sub(amount_in)
+        let profit = minimum_final_amount
+            .checked_sub(amount_in)
             .ok_or(ErrorCode::ArithmeticError)?;
-        
+
         require!(
             profit >= ctx.accounts.swap_state.profit_threshold,
             ErrorCode::InsufficientProfit
@@ -110,11 +107,7 @@ pub mod arbitrage {
         minimum_final_amount: u64,
     ) -> Result<()> {
         // First Orca swap
-        _orca_swap(
-            &ctx.accounts.orca_accounts_1,
-            amount_in,
-            minimum_amount_1,
-        )?;
+        _orca_swap(&ctx.accounts.orca_accounts_1, amount_in, minimum_amount_1)?;
 
         // Whirlpool swap
         _orca_swap(
@@ -124,9 +117,10 @@ pub mod arbitrage {
         )?;
 
         // Verify profit
-        let profit = minimum_final_amount.checked_sub(amount_in)
+        let profit = minimum_final_amount
+            .checked_sub(amount_in)
             .ok_or(ErrorCode::ArithmeticError)?;
-        
+
         require!(
             profit >= ctx.accounts.swap_state.profit_threshold,
             ErrorCode::InsufficientProfit

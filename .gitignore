@@ -2,6 +2,16 @@
 .env.*
 !.env.example
 **/target/
+**/node_modules/
+**/test-ledger/
+**/.anchor/
 **/*keypair*.json
 **/id.json
+**/wallet.json
+**/payer.json
+**/authority.json
+*.key
 *.pem
+*.p12
+*.pfx
+**/seed*.txt

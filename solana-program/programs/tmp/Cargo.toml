@@ -12,8 +12,14 @@ name = "tmp"
 no-entrypoint = []
 no-idl = []
 no-log-ix-name = []
+anchor-debug = []
+custom-heap = []
+custom-panic = []
 cpi = ["no-entrypoint"]
 default = []
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }
 
 [dependencies]
 anchor-lang = "=0.28.0"

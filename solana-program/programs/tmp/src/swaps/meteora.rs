@@ -10,53 +10,49 @@ pub struct MeteoraSwap<'info> {
     /// CHECK: Validated by Meteora program
     #[account(mut)]
     pub pool: AccountInfo<'info>,
-    
+
     /// CHECK: Validated by Meteora program
     #[account(mut)]
     pub a_vault: AccountInfo<'info>,
     /// CHECK: Validated by Meteora program
     #[account(mut)]
     pub b_vault: AccountInfo<'info>,
-    
+
     #[account(mut)]
     pub a_token_vault: Account<'info, TokenAccount>,
     #[account(mut)]
     pub b_token_vault: Account<'info, TokenAccount>,
-    
+
     /// CHECK: Validated by Meteora program
     #[account(mut)]
     pub a_vault_lp_mint: AccountInfo<'info>,
     /// CHECK: Validated by Meteora program
     #[account(mut)]
     pub b_vault_lp_mint: AccountInfo<'info>,
-    
+
     #[account(mut)]
     pub a_vault_lp: Account<'info, TokenAccount>,
     #[account(mut)]
     pub b_vault_lp: Account<'info, TokenAccount>,
-    
+
     #[account(mut)]
     pub admin_token_fee: Account<'info, TokenAccount>,
-    
+
     #[account(mut)]
     pub user_source_token: Account<'info, TokenAccount>,
     #[account(mut)]
     pub user_destination_token: Account<'info, TokenAccount>,
-    
+
     pub user: Signer<'info>,
     pub token_program: Program<'info, Token>,
     /// CHECK: Validated by Meteora program
     pub vault_program: AccountInfo<'info>,
-    
+
     pub meteora_program: Program<'info, DynamicAmm>,
 }
 
 impl<'info> MeteoraSwap<'info> {
-    pub fn process_swap(
-        &self,
-        amount_in: u64,
-        minimum_amount_out: u64,
-    ) -> Result<()> {
+    pub fn process_swap(&self, amount_in: u64, minimum_amount_out: u64) -> Result<()> {
         let cpi_accounts = MeteoraSwapAccounts {
             pool: self.pool.to_account_info(),
             a_vault: self.a_vault.to_account_info(),
@@ -75,16 +71,9 @@ impl<'info> MeteoraSwap<'info> {
             vault_program: self.vault_program.to_account_info(),
         };
 
-        let cpi_ctx = CpiContext::new(
-            self.meteora_program.to_account_info(),
-            cpi_accounts,
-        );
+        let cpi_ctx = CpiContext::new(self.meteora_program.to_account_info(), cpi_accounts);
 
-        dynamic_amm::cpi::swap(
-            cpi_ctx,
-            amount_in,
-            minimum_amount_out,
-        )?;
+        dynamic_amm::cpi::swap(cpi_ctx, amount_in, minimum_amount_out)?;
 
         Ok(())
     }

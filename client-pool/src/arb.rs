@@ -185,6 +185,14 @@ impl Arbitrager {
     }
 
     fn send_ixs(&self, ixs: Vec<Instruction>) {
+        if self.cluster != Cluster::Localnet {
+            eprintln!(
+                "legacy transaction construction is disabled outside localnet; \
+                 use the solana-mev observe-only monitor"
+            );
+            return;
+        }
+
         let owner: &Keypair = self.owner.borrow();
         let tx = Transaction::new_signed_with_payer(
             &ixs,
@@ -193,13 +201,7 @@ impl Arbitrager {
             self.connection.get_latest_blockhash().unwrap(),
         );
 
-        if self.cluster == Cluster::Localnet {
-            let res = self.connection.simulate_transaction(&tx).unwrap();
-            println!("{:#?}", res);
-        } else if self.cluster == Cluster::Mainnet {
-            eprintln!(
-                "legacy mainnet submission is disabled; use the solana-mev observe-only monitor"
-            );
-        }
+        let res = self.connection.simulate_transaction(&tx).unwrap();
+        println!("{:#?}", res);
     }
 }

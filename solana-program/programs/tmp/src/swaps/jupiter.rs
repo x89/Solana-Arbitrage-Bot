@@ -59,10 +59,7 @@ impl<'info> JupiterSwap<'info> {
         ];
 
         // Invoke the Jupiter swap instruction
-        invoke(
-            &ix,
-            &account_infos,
-        )?;
+        invoke(&ix, &account_infos)?;
 
         Ok(())
     }
