@@ -45,7 +45,7 @@ ahash = "=0.8.6"
 #jupiter-cpi = { git = "https://github.com/jup-ag/jupiter-cpi", rev = "5eb8977" }
 anchor-gen = { git = "https://github.com/jup-ag/anchor-gen.git", rev = "dae4c216b883ea089432ff5c00d100f4f662fd07" }
 #jupiter-amm-interface = ">=0.2.1"
-rand = "0.8.5"
+rand = "0.8.6"
 
 #meteora
 dlmm = { git = "https://github.com/MeteoraAg/dlmm-sdk/", package = "lb_clmm", rev = "fb350c54ab1d023dc0819d1c4d89e882fabdbf75", features = [
