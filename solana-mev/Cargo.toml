@@ -1,14 +1,21 @@
 [package]
 name = "mev-bot-solana"
 version = "0.2.0"
-edition = "2021"
-rust-version = "1.89"
-autotests = false
+description = "Observation-only Solana cyclic-arbitrage monitor using Jupiter Swap V2"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+publish = false
+keywords = ["solana", "jupiter", "arbitrage", "monitoring"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 anyhow = "1.0.103"
 clap = { version = "4.6.1", features = ["derive"] }
 futures-util = "0.3.32"
+httpdate = "1.0.3"
 reqwest = { version = "0.13.4", default-features = false, features = ["json", "query", "rustls", "stream"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
@@ -16,4 +23,7 @@ solana-pubkey = "4.2.0"
 tokio = { version = "1.52.3", features = ["macros", "rt-multi-thread", "time", "signal", "sync"] }
 toml = "1.1.2"
 tracing = "0.1.44"
-tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
+
+[dev-dependencies]
+wiremock = "0.6.5"

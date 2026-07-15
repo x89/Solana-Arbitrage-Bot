@@ -7,6 +7,7 @@ use solana_pubkey::Pubkey;
 #[derive(Debug, Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Config {
+    pub schema_version: u16,
     pub jupiter: JupiterConfig,
     pub scanner: ScannerConfig,
     pub routes: Vec<RouteConfig>,
@@ -42,6 +43,8 @@ pub struct ScannerConfig {
     pub fast_mode: bool,
     #[serde(default = "default_true")]
     pub require_different_venues: bool,
+    #[serde(default = "default_max_cycle_duration_ms")]
+    pub max_cycle_duration_ms: u64,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -83,6 +86,12 @@ impl Config {
     }
 
     fn validate(&self) -> Result<()> {
+        if self.schema_version != 1 {
+            bail!(
+                "unsupported config schema_version {}; expected 1",
+                self.schema_version
+            );
+        }
         let base_url =
             reqwest::Url::parse(&self.jupiter.base_url).context("invalid jupiter.base_url")?;
         if base_url.scheme() != "https" {
@@ -105,6 +114,9 @@ impl Config {
         if self.jupiter.request_timeout_ms < 100 {
             bail!("jupiter.request_timeout_ms must be at least 100");
         }
+        if self.jupiter.request_timeout_ms > 60_000 {
+            bail!("jupiter.request_timeout_ms must be at most 60000");
+        }
         if self.jupiter.min_request_interval_ms > 60_000 {
             bail!("jupiter.min_request_interval_ms must be at most 60000");
         }
@@ -119,6 +131,9 @@ impl Config {
         }
         if !(1..=64).contains(&self.scanner.max_accounts) {
             bail!("scanner.max_accounts must be between 1 and 64");
+        }
+        if !(100..=300_000).contains(&self.scanner.max_cycle_duration_ms) {
+            bail!("scanner.max_cycle_duration_ms must be between 100 and 300000");
         }
 
         let enabled_routes: Vec<_> = self.routes.iter().filter(|route| route.enabled).collect();
@@ -226,6 +241,10 @@ const fn default_max_accounts() -> u8 {
     64
 }
 
+const fn default_max_cycle_duration_ms() -> u64 {
+    15_000
+}
+
 const fn default_true() -> bool {
     true
 }
@@ -236,6 +255,7 @@ mod tests {
 
     fn valid_config() -> Config {
         Config {
+            schema_version: 1,
             jupiter: JupiterConfig {
                 base_url: "https://api.jup.ag/swap/v2".to_owned(),
                 api_key_env: "JUPITER_API_KEY".to_owned(),
@@ -250,6 +270,7 @@ mod tests {
                 max_accounts: 64,
                 fast_mode: true,
                 require_different_venues: true,
+                max_cycle_duration_ms: 15_000,
             },
             routes: vec![RouteConfig {
                 name: "USDC-WSOL-USDC".to_owned(),
@@ -305,6 +326,8 @@ mod tests {
     #[test]
     fn rejects_unknown_configuration_fields() {
         let contents = r#"
+            schema_version = 1
+
             [jupiter]
             base_url = "https://api.jup.ag/swap/v2"
 

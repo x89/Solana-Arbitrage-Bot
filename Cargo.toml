@@ -1,0 +1,14 @@
+[workspace]
+members = ["solana-mev"]
+exclude = [
+    "legacy/arbitrage",
+    "legacy/client-pool",
+    "legacy/solana-program",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+rust-version = "1.89"
+license = "MIT"
+repository = "https://github.com/x89/Solana-Arbitrage-Bot"

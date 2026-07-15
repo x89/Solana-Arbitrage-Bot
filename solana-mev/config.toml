@@ -1,3 +1,5 @@
+schema_version = 1
+
 [jupiter]
 # Jupiter Swap V2 requires an API key from https://portal.jup.ag.
 base_url = "https://api.jup.ag/swap/v2"
@@ -17,6 +19,8 @@ max_accounts = 64
 fast_mode = true
 # Reject a candidate when both legs use any of the same AMM/pool accounts.
 require_different_venues = true
+# Discard a candidate when both quote requests do not finish within this age.
+max_cycle_duration_ms = 15000
 
 [[routes]]
 name = "USDC-WSOL-USDC"

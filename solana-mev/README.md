@@ -5,8 +5,8 @@ dry-run cyclic-arbitrage monitor built against Jupiter Swap V2. Jupiter supplies
 current routes and account layouts, so the monitor does not depend on stale
 Raydium, Orca, or Meteora IDLs.
 
-The old files outside `src/` are retained as legacy design material. They are
-not compiled by this crate.
+Historical files were moved to `../legacy/solana-mev-prototype`; only `src/`
+and the integration tests in this directory belong to the maintained crate.
 
 ## Safety and scope
 
@@ -16,6 +16,8 @@ not compiled by this crate.
 - The second quote is requested after the first, so the quotes are not atomic.
 - The return quote uses the forward leg's minimum output, and requests are
   serialized according to `jupiter.min_request_interval_ms`.
+- The complete two-quote cycle is cancelled when it reaches
+  `scanner.max_cycle_duration_ms`.
 - Execution must simulate a single composed transaction and include priority
   fees, Jito tips, token transfer fees, and account-rent costs.
 
@@ -33,28 +35,42 @@ Solana 1.x SDK.
 
 ## Run
 
+From the repository root:
+
 ```bash
 export JUPITER_API_KEY="..."
 export SOLANA_TAKER_PUBKEY="your-public-wallet-address"
 
-cargo run --release -- --once
+cargo run --release --package mev-bot-solana -- \
+  --config solana-mev/config.toml --once
 # Or monitor continuously:
-cargo run --release
+cargo run --release --package mev-bot-solana -- \
+  --config solana-mev/config.toml
 ```
 
 Configure routes and risk assumptions in `config.toml`. All amounts are integer
 base units; do not use floating-point UI amounts. The per-route cost allowance
 is an operator estimate, not proof that all execution costs are covered.
+Configuration requires `schema_version = 1`.
+
+Validate configuration without credentials or a network request:
+
+```bash
+cargo run --package mev-bot-solana -- \
+  --config solana-mev/config.toml --validate-config
+```
+
+Use `--log-format json` for structured log ingestion and `RUST_LOG=debug` for
+request latency details.
 
 Useful checks:
 
 ```bash
-cargo fmt --check
-cargo clippy --all-targets --all-features -- -D warnings
-cargo test
+cargo fmt --all -- --check
+cargo check --workspace --all-targets --all-features --locked
+cargo test --workspace --all-targets --all-features --locked
+cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
 ```
-
-Set `RUST_LOG=debug` for more logging.
 
 ## Current protocol boundary
 

@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: macos-14
+            target: aarch64-apple-darwin
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pinned Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.89.0
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: release-${{ matrix.target }}
+
+      - name: Verify tag matches crate version
+        shell: bash
+        run: |
+          version="$(cargo +1.89.0 metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "mev-bot-solana") | .version')"
+          test "${GITHUB_REF_NAME}" = "v${version}"
+
+      - name: Build release binary
+        run: cargo +1.89.0 build --package mev-bot-solana --release --locked --target "${{ matrix.target }}"
+
+      - name: Package binary and checksum
+        shell: bash
+        run: |
+          mkdir -p dist
+          archive="solana-arbitrage-monitor-${GITHUB_REF_NAME}-${{ matrix.target }}.tar.gz"
+          cp "target/${{ matrix.target }}/release/mev-bot-solana" solana-arbitrage-monitor
+          tar -czf "dist/${archive}" solana-arbitrage-monitor README.md SECURITY.md CHANGELOG.md
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "dist/${archive}" > "dist/${archive}.sha256"
+          else
+            shasum -a 256 "dist/${archive}" > "dist/${archive}.sha256"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.target }}
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+
+      - name: Attest release artifacts
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/*
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" dist/* --verify-tag --generate-notes

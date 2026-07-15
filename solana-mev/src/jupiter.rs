@@ -1,4 +1,9 @@
-use std::{collections::BTreeSet, fmt, sync::Arc, time::Duration};
+use std::{
+    collections::BTreeSet,
+    fmt,
+    sync::Arc,
+    time::{Duration, SystemTime},
+};
 
 use anyhow::{bail, Context, Result};
 use futures_util::StreamExt;
@@ -151,6 +156,7 @@ impl JupiterClient {
             amount = request.amount,
             "requesting Jupiter quote"
         );
+        let request_started = Instant::now();
         let response = self
             .http
             .get(endpoint)
@@ -163,6 +169,12 @@ impl JupiterClient {
         let status = response.status();
         let retry_after = parse_retry_after(&response);
         let body = read_bounded_body(response).await?;
+        debug!(
+            status = %status,
+            elapsed_ms = request_started.elapsed().as_millis(),
+            response_bytes = body.len(),
+            "Jupiter quote response received"
+        );
         if !status.is_success() {
             return Err(api_error(status, retry_after, &body));
         }
@@ -258,14 +270,13 @@ async fn read_bounded_body(response: Response) -> Result<String> {
 }
 
 fn parse_retry_after(response: &Response) -> Option<Duration> {
-    response
-        .headers()
-        .get(RETRY_AFTER)?
-        .to_str()
-        .ok()?
-        .parse::<u64>()
-        .ok()
-        .map(Duration::from_secs)
+    let value = response.headers().get(RETRY_AFTER)?.to_str().ok()?;
+    if let Ok(seconds) = value.parse::<u64>() {
+        return Some(Duration::from_secs(seconds));
+    }
+
+    let retry_at = httpdate::parse_http_date(value).ok()?;
+    retry_at.duration_since(SystemTime::now()).ok()
 }
 
 pub fn api_error_details(error: &anyhow::Error) -> Option<&JupiterApiError> {

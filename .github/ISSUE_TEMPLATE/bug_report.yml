@@ -1,0 +1,43 @@
+name: Bug report
+description: Report reproducible behavior in the supported observation-only monitor
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Reports about archived code under `legacy/` are not accepted unless they concern repository safety.
+        Never paste API keys, keypairs, seed phrases, private RPC URLs, or funded wallet details.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Release tag or commit SHA
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Redact all credentials and wallet identifiers before submitting.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, Rust version, command, and redacted configuration
+    validations:
+      required: true

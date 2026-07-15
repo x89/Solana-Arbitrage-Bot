@@ -1,14 +1,26 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, time::Duration};
 
 use anyhow::{Context, Result};
+use tokio::time::Instant;
 
 use crate::{
     config::{RouteConfig, ScannerConfig},
     jupiter::{JupiterClient, Quote, QuoteRequest},
 };
 
-pub struct Scanner {
-    jupiter: JupiterClient,
+#[allow(async_fn_in_trait)]
+pub trait QuoteProvider {
+    async fn quote(&self, request: QuoteRequest<'_>) -> Result<Quote>;
+}
+
+impl QuoteProvider for JupiterClient {
+    async fn quote(&self, request: QuoteRequest<'_>) -> Result<Quote> {
+        JupiterClient::quote(self, request).await
+    }
+}
+
+pub struct Scanner<Q = JupiterClient> {
+    jupiter: Q,
     config: ScannerConfig,
     taker: String,
 }
@@ -26,11 +38,12 @@ pub struct Evaluation {
     pub forward_venues: Vec<String>,
     pub return_venues: Vec<String>,
     pub venues_are_different: bool,
+    pub cycle_duration_ms: u64,
     pub is_opportunity: bool,
 }
 
-impl Scanner {
-    pub fn new(jupiter: JupiterClient, config: ScannerConfig, taker: String) -> Self {
+impl<Q: QuoteProvider> Scanner<Q> {
+    pub fn new(jupiter: Q, config: ScannerConfig, taker: String) -> Self {
         Self {
             jupiter,
             config,
@@ -39,6 +52,21 @@ impl Scanner {
     }
 
     pub async fn evaluate(&self, route: &RouteConfig) -> Result<Evaluation> {
+        let started = Instant::now();
+        let maximum_duration = Duration::from_millis(self.config.max_cycle_duration_ms);
+        let mut evaluation = tokio::time::timeout(maximum_duration, self.evaluate_inner(route))
+            .await
+            .with_context(|| {
+                format!(
+                    "quote cycle for {} exceeded {} ms",
+                    route.name, self.config.max_cycle_duration_ms
+                )
+            })??;
+        evaluation.cycle_duration_ms = started.elapsed().as_millis().try_into().unwrap_or(u64::MAX);
+        Ok(evaluation)
+    }
+
+    async fn evaluate_inner(&self, route: &RouteConfig) -> Result<Evaluation> {
         let forward = self
             .jupiter
             .quote(self.quote_request(
@@ -82,6 +110,7 @@ impl Scanner {
             forward_venues: forward.venue_labels,
             return_venues: backward.venue_labels,
             venues_are_different,
+            cycle_duration_ms: 0,
             is_opportunity: meets_profit_threshold(
                 estimated_net_profit,
                 route.amount,

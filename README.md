@@ -5,7 +5,7 @@ supported implementation uses Jupiter Swap V2 to evaluate configured
 round-trip routes without loading a private key, signing a transaction, or
 submitting anything on-chain.
 
-> **Project status — July 2026**
+> **Project status — 15 July 2026**
 >
 > `solana-mev` is the only maintained and supported component. It is suitable
 > for quote monitoring and engineering research, not funded execution. The
@@ -26,6 +26,7 @@ submitting anything on-chain.
 - [Understanding the output](#understanding-the-output)
 - [Reliability and security controls](#reliability-and-security-controls)
 - [Verification](#verification)
+- [Operations and releases](#operations-and-releases)
 - [Known limitations](#known-limitations)
 - [Legacy workspaces](#legacy-workspaces)
 - [Path to transaction execution](#path-to-transaction-execution)
@@ -45,7 +46,9 @@ For each enabled route, the monitor:
 5. Checks the resulting profit against the configured basis-point threshold.
 6. Optionally rejects routes whose two legs use any of the same Jupiter
    `ammKey` liquidity-source accounts.
-7. Logs either a normal route evaluation or a candidate opportunity.
+7. Discards the result if the complete two-quote cycle exceeds its configured
+   freshness deadline.
+8. Logs either a normal route evaluation or a candidate opportunity.
 
 The monitor uses the current Jupiter `/swap/v2/build` response for routing
 information. Although that endpoint also returns transaction instructions, this
@@ -128,17 +131,18 @@ the real result materially different.
 
 - `solana-mev/` — maintained Rust monitor and the only supported runnable
   component.
+- `Cargo.toml`, `Cargo.lock`, and `rust-toolchain.toml` — reproducible root
+  workspace containing only the maintained monitor.
+- `.github/` — CI, dependency updates, review ownership, issue forms, and
+  attested release automation.
 - `MIGRATION.md` — dated protocol, dependency, and migration findings.
-- `client-pool/` — archived Solana 1.9 / Anchor 0.22 pool-client experiment.
-- `arbitrage/` — archived, non-buildable direct-CPI arbitrage prototype.
-- `solana-program/` — archived Anchor program that host-compiles on a pinned
-  legacy stack but does not implement valid current-mainnet CPIs.
-- `*.mermaid` — legacy conceptual diagrams, explicitly marked as such. The
-  architecture in this README describes the supported monitor.
+- `legacy/` — excluded historical clients, Anchor programs, and uncompiled
+  prototypes.
+- `docs/legacy/` — obsolete conceptual diagrams retained for archaeology.
 
 ## Requirements
 
-- Rust 1.89 or newer.
+- `rustup`; the repository pins Rust 1.89.0 with rustfmt and Clippy.
 - A Jupiter API key from <https://portal.jup.ag>.
 - A valid public Solana wallet address for Jupiter's required `taker`
   parameter.
@@ -150,12 +154,11 @@ for the supported monitor.
 ## Quick start
 
 ```bash
-cd solana-mev
-
 export JUPITER_API_KEY="your-jupiter-api-key"
 export SOLANA_TAKER_PUBKEY="your-public-solana-address"
 
-cargo run --release -- --once
+cargo run --release --package mev-bot-solana -- \
+  --config solana-mev/config.toml --once
 ```
 
 The `--once` command evaluates every enabled route once and exits. It returns a
@@ -165,10 +168,10 @@ checks and controlled automation.
 For continuous monitoring:
 
 ```bash
-cd solana-mev
 export JUPITER_API_KEY="your-jupiter-api-key"
 export SOLANA_TAKER_PUBKEY="your-public-solana-address"
-cargo run --release
+cargo run --release --package mev-bot-solana -- \
+  --config solana-mev/config.toml
 ```
 
 ## Configuration
@@ -176,6 +179,16 @@ cargo run --release
 The default configuration is
 [`solana-mev/config.toml`](solana-mev/config.toml). Unknown fields are rejected
 instead of being silently ignored, so spelling mistakes fail at startup.
+`schema_version = 1` is required, making incompatible future configuration
+changes explicit.
+
+Validate configuration structure and values without setting credentials or
+calling Jupiter:
+
+```bash
+cargo run --package mev-bot-solana -- \
+  --config solana-mev/config.toml --validate-config
+```
 
 ### Jupiter settings
 
@@ -199,7 +212,7 @@ instead of being silently ignored, so spelling mistakes fail at startup.
 `request_timeout_ms`
 
 - Timeout for each Jupiter HTTP request.
-- Must be at least 100 milliseconds.
+- Allowed range: `100` through `60000` milliseconds.
 - Default: `5000`.
 
 `min_request_interval_ms`
@@ -249,6 +262,13 @@ instead of being silently ignored, so spelling mistakes fail at startup.
 - This reduces obvious self-reuse of the same liquidity source.
 - It does not prove that the routes are economically independent.
 
+`max_cycle_duration_ms`
+
+- Maximum wall-clock age of the complete forward-and-return quote cycle.
+- A cycle that reaches this deadline is cancelled and cannot become a
+  candidate.
+- Allowed range: `100` through `300000`; default: `15000`.
+
 ### Route settings
 
 Each `[[routes]]` block defines one cycle:
@@ -295,6 +315,8 @@ Each `[[routes]]` block defines one cycle:
 Example:
 
 ```toml
+schema_version = 1
+
 [jupiter]
 base_url = "https://api.jup.ag/swap/v2"
 api_key_env = "JUPITER_API_KEY"
@@ -309,6 +331,7 @@ slippage_bps = 30
 max_accounts = 64
 fast_mode = true
 require_different_venues = true
+max_cycle_duration_ms = 15000
 
 [[routes]]
 name = "USDC-WSOL-USDC"
@@ -326,38 +349,49 @@ enabled = true
 Run once with the default configuration:
 
 ```bash
-cd solana-mev
-cargo run --release -- --once
+cargo run --release --package mev-bot-solana -- \
+  --config solana-mev/config.toml --once
 ```
 
 Use a different configuration:
 
 ```bash
-cargo run --release -- --config /absolute/path/to/config.toml --once
+cargo run --release --package mev-bot-solana -- \
+  --config /absolute/path/to/config.toml --once
 ```
 
 Run continuously:
 
 ```bash
-cargo run --release
+cargo run --release --package mev-bot-solana -- \
+  --config solana-mev/config.toml
 ```
 
 Enable request-level diagnostic logging:
 
 ```bash
-RUST_LOG=debug cargo run --release -- --once
+RUST_LOG=debug cargo run --package mev-bot-solana -- \
+  --config solana-mev/config.toml --once
+```
+
+Emit newline-delimited JSON for log collection:
+
+```bash
+cargo run --release --package mev-bot-solana -- \
+  --config solana-mev/config.toml --log-format json
 ```
 
 Display command-line help:
 
 ```bash
-cargo run --release -- --help
+cargo run --package mev-bot-solana -- --help
 ```
 
 ## Understanding the output
 
 Normal evaluations are logged at `INFO` level and include:
 
+- scan identifier and quote-cycle duration;
 - route name;
 - estimated profit in basis points;
 - minimum final amount;
@@ -376,6 +410,10 @@ cause chain. A candidate log means only that two sequential API responses
 satisfied the configured rules. It is not an execution recommendation or
 profit guarantee.
 
+Every pass ends with a structured scan summary containing route, error,
+candidate, and elapsed-time counts. Human and JSON formats carry the same
+fields.
+
 ## Reliability and security controls
 
 The maintained monitor includes the following safeguards:
@@ -389,25 +427,30 @@ The maintained monitor includes the following safeguards:
   thresholds are validated before use.
 - Configuration values, Solana addresses, route names, and DEX labels are
   validated at startup.
+- A required schema version prevents silent configuration drift.
 - Requests are serialized through a shared minimum-interval gate.
-- `Retry-After` is honored up to five minutes.
+- Delta-seconds and HTTP-date `Retry-After` values are honored up to five
+  minutes.
+- Quote cycles are cancelled at `max_cycle_duration_ms`; stale cycles are
+  rejected.
 - Fully failed scans use exponential backoff capped at 60 seconds.
 - Jupiter `401` and `403` responses stop continuous monitoring instead of
   retrying invalid credentials forever.
 - Error logs include the complete context chain while never logging the API
   key.
+- `Ctrl-C` cancels either an active scan or the inter-scan wait cleanly.
+- CI checks the MSRV and latest stable Rust, tests, strict Clippy, RustSec,
+  license/source policy, and repository history for secrets.
 
 ## Verification
 
-From the supported crate:
+From the repository root:
 
 ```bash
-cd solana-mev
-
-cargo fmt --check
-cargo check --all-targets --all-features --locked
-cargo test --all-targets --all-features --locked
-cargo clippy --all-targets --all-features --locked -- -D warnings
+cargo fmt --all -- --check
+cargo check --workspace --all-targets --all-features --locked
+cargo test --workspace --all-targets --all-features --locked
+cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
 ```
 
 Dependency audit:
@@ -415,23 +458,44 @@ Dependency audit:
 ```bash
 cargo install cargo-audit --locked
 cargo audit
+cargo install cargo-deny --locked
+cargo deny check
 ```
 
-As of 2026-07-14:
+As of 2026-07-15:
 
 - formatting passes;
 - all targets and features compile;
-- 10 unit tests pass;
+- 10 unit tests and 7 deterministic integration tests pass;
 - strict Clippy passes with warnings denied;
-- the supported Rust lockfile has no RustSec vulnerabilities.
+- the supported workspace lockfile has no RustSec vulnerabilities.
+
+Integration tests use a local mock HTTP server and a fake quote provider. They
+cover request construction, response parsing, redirects, bounded bodies,
+rate-limit metadata, request serialization, conservative leg chaining,
+liquidity-source separation, cost deductions, and stale-cycle rejection
+without depending on live mainnet state.
 
 These checks validate the off-chain monitor only. They do not certify that a
 candidate is executable, validate mainnet liquidity, or make the archived CPI
 programs safe.
 
+## Operations and releases
+
+See [`docs/OPERATIONS.md`](docs/OPERATIONS.md) for protected-branch settings,
+credential-incident actions, deployment checks, health signals, rollback, and
+the release procedure. Repository source cannot revoke a provider credential
+or enable GitHub branch protection; the owner must complete and verify those
+two controls.
+
+Tags matching `v<crate-version>` build Linux x86-64 and Apple Silicon macOS
+archives. The release workflow publishes SHA-256 checksums and GitHub
+build-provenance attestations, and rejects a tag that does not match the Cargo
+package version.
+
 ## Known limitations
 
-- Quotes are sequential rather than atomic.
+- Quotes are sequential rather than atomic, even with the freshness deadline.
 - No exact transaction is assembled or simulated.
 - No recent-blockhash, account-lock, or address-lookup-table behavior is
   tested.
@@ -443,14 +507,15 @@ programs safe.
   available at transaction execution time.
 - Requiring disjoint `ammKey` sets is a useful filter, not proof of independent
   price formation.
-- Unit tests use local fixtures; there is no funded or live-mainnet integration
-  test.
+- Tests are deterministic and offline; there is intentionally no funded or
+  live-mainnet execution test.
 
 ## Legacy workspaces
 
-The following directories remain for historical analysis only.
+The following directories remain under `legacy/` for historical analysis only
+and are excluded from the root Cargo workspace, CI, and releases.
 
-### `client-pool`
+### `legacy/client-pool`
 
 - Uses an obsolete Solana 1.9 / Anchor 0.22 dependency stack.
 - Contains retired Serum and Orca Token Swap models.
@@ -459,16 +524,16 @@ The following directories remain for historical analysis only.
   replaced by a newer, ABI-incompatible program.
 - Mainnet transaction construction and helper scripts are disabled.
 
-### `arbitrage`
+### `legacy/arbitrage`
 
 - Contains incompatible Anchor and Solana dependency generations.
 - Uses invalid or inconsistent program identities.
 - Has incomplete account constraints, instruction encoders, and profit checks.
-- Its former key-reading integration test is replaced by an explicit skipped
-  quarantine test.
+- Its former key-reading integration test is archived and never discovered by
+  the maintained test runner.
 - Deployment helper scripts are disabled.
 
-### `solana-program`
+### `legacy/solana-program`
 
 - Host compilation succeeds on a pinned legacy stack.
 - Its direct Orca, Raydium, Jupiter, and Meteora calls do not conform to current

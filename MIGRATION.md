@@ -12,7 +12,7 @@ arrays, or fee math still match mainnet.
 
 ## Current toolchain and APIs
 
-- Rust: 1.89 minimum; tested with 1.97
+- Rust: 1.89 minimum and pinned; CI also checks the latest stable release
 - Solana address crate: `solana-pubkey` 4.2
 - Jupiter: `https://api.jup.ag/swap/v2/build`
 - Anchor latest stable reviewed: 1.0.2
@@ -72,15 +72,17 @@ token. The exposed token and absolute wallet path were removed from the legacy
 pool client. Repository inspection cannot verify whether the former token was
 revoked, so its owner must confirm revocation separately.
 
-## Legacy workspace build status (verified 2026-07-14)
+## Legacy workspace disposition (verified 2026-07-15)
 
-- `solana-mev`: previously had no Cargo binary/library target; `cargo check`
-  only checked dependency resolution. It now has a real `src/` target.
-- `client-pool`: broken path dependency and obsolete Solana/Anchor 0.22 stack.
-- `arbitrage`: dependency graph mixes Anchor 0.28/0.29 and Solana 1.16/2.0,
-  producing incompatible `Pubkey` types.
-- `solana-program`: host `cargo check` succeeds on its pinned legacy stack, but
-  that does not validate mainnet CPI behavior.
+- The root workspace includes only the maintained `solana-mev` crate.
+- `legacy/client-pool`: broken path dependency and obsolete Solana/Anchor 0.22
+  stack.
+- `legacy/arbitrage`: dependency graph mixes Anchor 0.28/0.29 and Solana
+  1.16/2.0, producing incompatible `Pubkey` types.
+- `legacy/solana-program`: host `cargo check` previously succeeded on its
+  pinned legacy stack, but that does not validate mainnet CPI behavior.
+- `legacy/solana-mev-prototype`: uncompiled historical bot concepts that were
+  formerly mixed into the maintained crate directory.
 
 Dependency audits on 2026-07-14 found no RustSec vulnerabilities in the
 supported `solana-mev` monitor. The three legacy Rust lockfiles contain multiple
