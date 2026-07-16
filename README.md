@@ -267,6 +267,7 @@ cargo run --package mev-bot-solana -- \
 - Maximum wall-clock age of the complete forward-and-return quote cycle.
 - A cycle that reaches this deadline is cancelled and cannot become a
   candidate.
+- Must be greater than `jupiter.min_request_interval_ms`.
 - Allowed range: `100` through `300000`; default: `15000`.
 
 ### Route settings
@@ -429,18 +430,20 @@ The maintained monitor includes the following safeguards:
   validated at startup.
 - A required schema version prevents silent configuration drift.
 - Requests are serialized through a shared minimum-interval gate.
-- Delta-seconds and HTTP-date `Retry-After` values are honored up to five
-  minutes.
+- Jupiter's absolute `x-ratelimit-reset` timestamp is preferred for `429`
+  responses; delta-seconds and HTTP-date `Retry-After` remain supported
+  fallbacks. Reported delays are honored up to five minutes.
 - Quote cycles are cancelled at `max_cycle_duration_ms`; stale cycles are
   rejected.
 - Fully failed scans use exponential backoff capped at 60 seconds.
-- Jupiter `401` and `403` responses stop continuous monitoring instead of
-  retrying invalid credentials forever.
+- Jupiter `401` and `403` responses stop the active scan immediately instead
+  of sending more requests with denied access.
 - Error logs include the complete context chain while never logging the API
   key.
 - `Ctrl-C` cancels either an active scan or the inter-scan wait cleanly.
 - CI checks the MSRV and latest stable Rust, tests, strict Clippy, RustSec,
-  license/source policy, and repository history for secrets.
+  license/source policy, changed commits for secrets, and the full repository
+  history on a weekly or manually triggered scan.
 
 ## Verification
 
@@ -466,7 +469,7 @@ As of 2026-07-15:
 
 - formatting passes;
 - all targets and features compile;
-- 10 unit tests and 7 deterministic integration tests pass;
+- 13 unit tests and 7 deterministic integration tests pass;
 - strict Clippy passes with warnings denied;
 - the supported workspace lockfile has no RustSec vulnerabilities.
 
@@ -488,10 +491,10 @@ the release procedure. Repository source cannot revoke a provider credential
 or enable GitHub branch protection; the owner must complete and verify those
 two controls.
 
-Tags matching `v<crate-version>` build Linux x86-64 and Apple Silicon macOS
-archives. The release workflow publishes SHA-256 checksums and GitHub
-build-provenance attestations, and rejects a tag that does not match the Cargo
-package version.
+Signed tags matching `v<crate-version>` on the default branch build Linux
+x86-64 and Apple Silicon macOS archives. The release workflow reruns quality
+gates, publishes SHA-256 checksums and GitHub build-provenance attestations, and
+rejects a tag that does not match the Cargo package version.
 
 ## Known limitations
 
@@ -593,8 +596,10 @@ Do not provide a filesystem path, JSON keypair, seed phrase, or private key.
 
 ### Jupiter returns `401` or `403`
 
-The API key is missing, invalid, expired, or not authorized. The monitor stops
-because repeatedly retrying a credential failure is not useful.
+`401` normally means that the API key is missing, invalid, or expired. `403`
+can also mean that the key lacks endpoint permission or that Jupiter's firewall
+blocked access. The monitor stops immediately; check credentials, portal
+permissions, and network/firewall policy.
 
 ### Jupiter returns `429`
 

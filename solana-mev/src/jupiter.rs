@@ -2,13 +2,14 @@ use std::{
     collections::BTreeSet,
     fmt,
     sync::Arc,
-    time::{Duration, SystemTime},
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
 use anyhow::{bail, Context, Result};
 use futures_util::StreamExt;
 use reqwest::{header::RETRY_AFTER, Client, Response, StatusCode};
 use serde::Deserialize;
+use solana_pubkey::Pubkey;
 use tokio::{sync::Mutex, time::Instant};
 use tracing::debug;
 
@@ -228,6 +229,12 @@ fn parse_quote(body: &str, request: &QuoteRequest<'_>) -> Result<Quote> {
         if label.is_empty() || amm_key.is_empty() {
             bail!("Jupiter returned an incomplete route step");
         }
+        amm_key
+            .parse::<Pubkey>()
+            .with_context(|| format!("Jupiter returned an invalid AMM key: {amm_key}"))?;
+        if !request.dexes.is_empty() && !request.dexes.iter().any(|dex| dex == label) {
+            bail!("Jupiter returned venue {label:?} outside the requested DEX set");
+        }
         venue_labels.insert(label.to_owned());
         amm_keys.insert(amm_key.to_owned());
     }
@@ -270,6 +277,23 @@ async fn read_bounded_body(response: Response) -> Result<String> {
 }
 
 fn parse_retry_after(response: &Response) -> Option<Duration> {
+    if response.status() == StatusCode::TOO_MANY_REQUESTS {
+        let reset_timestamp = response
+            .headers()
+            .get("x-ratelimit-reset")
+            .and_then(|value| value.to_str().ok())
+            .and_then(|value| value.parse::<u64>().ok());
+        if let Some(reset_timestamp) = reset_timestamp {
+            if let Some(reset_at) = UNIX_EPOCH.checked_add(Duration::from_secs(reset_timestamp)) {
+                return Some(
+                    reset_at
+                        .duration_since(SystemTime::now())
+                        .unwrap_or_default(),
+                );
+            }
+        }
+    }
+
     let value = response.headers().get(RETRY_AFTER)?.to_str().ok()?;
     if let Ok(seconds) = value.parse::<u64>() {
         return Some(Duration::from_secs(seconds));
@@ -308,6 +332,7 @@ mod tests {
 
     const INPUT_MINT: &str = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
     const OUTPUT_MINT: &str = "So11111111111111111111111111111111111111112";
+    const AMM_KEY: &str = "11111111111111111111111111111111";
 
     fn request() -> QuoteRequest<'static> {
         QuoteRequest {
@@ -341,16 +366,18 @@ mod tests {
     fn parses_and_deduplicates_valid_route_labels() {
         let body = response(
             "747750000",
-            r#"[
-                {"swapInfo":{"ammKey":"pool-a","label":"Raydium CLMM"}},
-                {"swapInfo":{"ammKey":"pool-a","label":"Raydium CLMM"}}
-            ]"#,
+            &format!(
+                r#"[
+                    {{"swapInfo":{{"ammKey":"{AMM_KEY}","label":"Raydium CLMM"}}}},
+                    {{"swapInfo":{{"ammKey":"{AMM_KEY}","label":"Raydium CLMM"}}}}
+                ]"#
+            ),
         );
         let quote = parse_quote(&body, &request()).unwrap();
 
         assert_eq!(quote.minimum_out_amount, 747_750_000);
         assert_eq!(quote.venue_labels, ["Raydium CLMM"]);
-        assert_eq!(quote.amm_keys, ["pool-a"]);
+        assert_eq!(quote.amm_keys, [AMM_KEY]);
     }
 
     #[test]
@@ -365,5 +392,28 @@ mod tests {
             &request()
         )
         .is_err());
+        assert!(parse_quote(
+            &response(
+                "747750000",
+                r#"[{"swapInfo":{"ammKey":"not-a-pubkey","label":"Raydium CLMM"}}]"#
+            ),
+            &request()
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn rejects_a_venue_outside_the_requested_dex_set() {
+        let dexes = vec!["Orca Whirlpool".to_owned()];
+        let request = QuoteRequest {
+            dexes: &dexes,
+            ..request()
+        };
+        let body = response(
+            "747750000",
+            &format!(r#"[{{"swapInfo":{{"ammKey":"{AMM_KEY}","label":"Raydium CLMM"}}}}]"#),
+        );
+
+        assert!(parse_quote(&body, &request).is_err());
     }
 }

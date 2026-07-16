@@ -5,7 +5,7 @@ use clap::{Parser, ValueEnum};
 use mev_bot_solana::{
     config::{Config, RouteConfig},
     jupiter::{api_error_details, JupiterClient},
-    scanner::Scanner,
+    scanner::{QuoteProvider, Scanner},
 };
 use tracing::{error, info, warn};
 use tracing_subscriber::EnvFilter;
@@ -84,7 +84,10 @@ async fn main() -> Result<()> {
             }
         };
         if outcome.permanent_error {
-            bail!("Jupiter rejected the configured credentials; monitoring stopped");
+            bail!(
+                "Jupiter denied API access; check credentials, endpoint permissions, \
+                 and firewall policy"
+            );
         }
         if args.once {
             anyhow::ensure!(
@@ -142,7 +145,11 @@ struct ScanOutcome {
     retry_after: Option<Duration>,
 }
 
-async fn scan_once(scanner: &Scanner, routes: &[RouteConfig], scan_id: u64) -> ScanOutcome {
+async fn scan_once<Q: QuoteProvider>(
+    scanner: &Scanner<Q>,
+    routes: &[RouteConfig],
+    scan_id: u64,
+) -> ScanOutcome {
     let started = tokio::time::Instant::now();
     let mut outcome = ScanOutcome::default();
     for route in routes {
@@ -180,11 +187,16 @@ async fn scan_once(scanner: &Scanner, routes: &[RouteConfig], scan_id: u64) -> S
             }
             Err(error) => {
                 outcome.errors += 1;
+                let mut permanent_error = false;
                 if let Some(api_error) = api_error_details(&error) {
-                    outcome.permanent_error |= api_error.is_permanent();
+                    permanent_error = api_error.is_permanent();
+                    outcome.permanent_error |= permanent_error;
                     outcome.retry_after = outcome.retry_after.max(api_error.retry_after());
                 }
                 error!(scan_id, route = %route.name, error = ?error, "route evaluation failed");
+                if permanent_error {
+                    break;
+                }
             }
         }
     }
@@ -208,4 +220,74 @@ fn init_tracing(format: LogFormat) -> Result<()> {
     };
     result.map_err(|error| anyhow!("failed to initialize logging: {error}"))?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use mev_bot_solana::{
+        config::{RouteConfig, ScannerConfig},
+        jupiter::JupiterClient,
+        scanner::Scanner,
+    };
+    use serde_json::json;
+    use wiremock::{
+        matchers::{method, path},
+        Mock, MockServer, ResponseTemplate,
+    };
+
+    use super::scan_once;
+
+    fn route(name: &str) -> RouteConfig {
+        RouteConfig {
+            name: name.to_owned(),
+            start_mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v".to_owned(),
+            intermediate_mint: "So11111111111111111111111111111111111111112".to_owned(),
+            amount: 100_000_000,
+            estimated_cost_in_start_units: 10_000,
+            forward_dexes: Vec::new(),
+            return_dexes: Vec::new(),
+            enabled: true,
+        }
+    }
+
+    #[tokio::test]
+    async fn stops_scan_after_first_permanent_api_error() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/build"))
+            .respond_with(
+                ResponseTemplate::new(401).set_body_json(json!({"error": "unauthorized"})),
+            )
+            .expect(1)
+            .mount(&server)
+            .await;
+
+        let client = JupiterClient::new(
+            &server.uri(),
+            "test-api-key".to_owned(),
+            Duration::from_secs(1),
+            Duration::ZERO,
+        )
+        .expect("test client");
+        let scanner = Scanner::new(
+            client,
+            ScannerConfig {
+                interval_ms: 1_000,
+                min_profit_bps: 30,
+                slippage_bps: 30,
+                max_accounts: 64,
+                fast_mode: true,
+                require_different_venues: true,
+                max_cycle_duration_ms: 1_000,
+            },
+            "11111111111111111111111111111111".to_owned(),
+        );
+
+        let outcome = scan_once(&scanner, &[route("first"), route("second")], 1).await;
+
+        assert_eq!(outcome.errors, 1);
+        assert!(outcome.permanent_error);
+    }
 }

@@ -9,9 +9,10 @@ The repository owner must configure controls that source files cannot enable:
    `Dependency and license policy`, and `Secret scan` checks.
 3. Require CODEOWNER review and resolution of review conversations.
 4. Block force pushes and branch deletion.
-5. Enable private vulnerability reporting, Dependabot alerts, push protection,
+5. Protect `v*` tags, require signed tags, and enable immutable releases.
+6. Enable private vulnerability reporting, Dependabot alerts, push protection,
    and GitHub secret scanning where the repository plan supports them.
-6. Confirm at the provider that every historically exposed credential was
+7. Confirm at the provider that every historically exposed credential was
    revoked; retain the evidence privately.
 
 Do not mark the credential action complete merely because the value is absent
@@ -63,8 +64,9 @@ restart.
 1. Update `CHANGELOG.md` and the crate version in one reviewed pull request.
 2. Ensure all required checks pass on the protected default branch.
 3. Create a signed `v<crate-version>` Git tag.
-4. Push the tag. The release workflow rejects a tag that does not match the
-   crate version.
+4. Push the tag. The release workflow rejects unsigned tags, commits outside
+   the default branch, tags that do not match the crate version, and code that
+   fails the release-time quality gates.
 5. Verify both platform archives, checksums, and GitHub build-provenance
    attestations on the generated release.
 

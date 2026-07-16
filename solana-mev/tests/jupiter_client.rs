@@ -1,4 +1,4 @@
-use std::time::{Duration, Instant, SystemTime};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use mev_bot_solana::jupiter::{api_error_details, JupiterClient, QuoteRequest};
 use serde_json::json;
@@ -10,6 +10,7 @@ use wiremock::{
 const INPUT_MINT: &str = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 const OUTPUT_MINT: &str = "So11111111111111111111111111111111111111112";
 const TAKER: &str = "11111111111111111111111111111111";
+const AMM_KEY: &str = "11111111111111111111111111111111";
 
 fn request() -> QuoteRequest<'static> {
     QuoteRequest {
@@ -35,7 +36,7 @@ fn quote_body() -> serde_json::Value {
         "slippageBps": 30,
         "routePlan": [{
             "swapInfo": {
-                "ammKey": "pool-a",
+                "ammKey": AMM_KEY,
                 "label": "Raydium CLMM"
             }
         }]
@@ -77,17 +78,21 @@ async fn sends_expected_request_and_parses_quote() {
 
     assert_eq!(quote.minimum_out_amount, 747_750_000);
     assert_eq!(quote.venue_labels, ["Raydium CLMM"]);
-    assert_eq!(quote.amm_keys, ["pool-a"]);
+    assert_eq!(quote.amm_keys, [AMM_KEY]);
 }
 
 #[tokio::test]
 async fn exposes_rate_limit_retry_metadata() {
     let server = MockServer::start().await;
+    let reset_timestamp = (SystemTime::now() + Duration::from_secs(60))
+        .duration_since(UNIX_EPOCH)
+        .expect("current time after Unix epoch")
+        .as_secs();
     Mock::given(method("GET"))
         .and(path("/build"))
         .respond_with(
             ResponseTemplate::new(429)
-                .insert_header("Retry-After", "7")
+                .insert_header("x-ratelimit-reset", reset_timestamp.to_string())
                 .set_body_json(json!({"error": "rate limited"})),
         )
         .mount(&server)
@@ -100,7 +105,9 @@ async fn exposes_rate_limit_retry_metadata() {
     let details = api_error_details(&error).expect("typed API error");
 
     assert!(!details.is_permanent());
-    assert_eq!(details.retry_after(), Some(Duration::from_secs(7)));
+    let retry_after = details.retry_after().expect("rate-limit reset metadata");
+    assert!(retry_after >= Duration::from_secs(55));
+    assert!(retry_after <= Duration::from_secs(60));
 }
 
 #[tokio::test]

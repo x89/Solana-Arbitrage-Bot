@@ -14,6 +14,13 @@ cargo check --workspace --all-targets --all-features --locked
 cargo test --workspace --all-targets --all-features --locked
 ```
 
+Install the two repository-policy tools before running the complete local gate:
+
+```bash
+cargo install cargo-audit --locked
+cargo install cargo-deny --locked
+```
+
 Copy only the environment variables you need from `.env.example`. The
 application does not read `.env` files automatically.
 
@@ -30,9 +37,11 @@ cargo audit
 cargo deny check
 ```
 
-CI repeats these checks on the minimum supported Rust version and latest stable
-Rust. Add unit or integration coverage for every behavior change. Tests must
-not depend on the public Jupiter service, funded wallets, or mainnet state.
+CI runs formatting, compilation, tests, and strict Clippy on the minimum
+supported Rust version; latest stable runs compilation and tests. Separate jobs
+run RustSec, cargo-deny, and secret scanning. Add unit or integration coverage
+for every behavior change. Tests must not depend on the public Jupiter service,
+funded wallets, or mainnet state.
 
 ## Pull requests
 

@@ -16,6 +16,10 @@ and uses semantic versioning for the supported monitor.
   dependency.
 - Machine-readable JSON logs, scan identifiers, latency fields, and scan
   summaries.
+- Observation-only Jupiter Swap V2 cyclic-arbitrage monitor.
+- Strict configuration and quote-response validation.
+- Conservative two-leg evaluation using the forward minimum output.
+- Request throttling, bounded response reads, retry handling, and unit tests.
 
 ### Changed
 
@@ -23,22 +27,16 @@ and uses semantic versioning for the supported monitor.
   under explicit legacy archives.
 - Added an explicit configuration schema version and quote-cycle freshness
   deadline.
-- Active scans now cancel cleanly on shutdown, and `Retry-After` supports both
-  delta-seconds and HTTP dates.
-
-## [0.2.0] - 2026-07-14
-
-### Added
-
-- Observation-only Jupiter Swap V2 cyclic-arbitrage monitor.
-- Strict configuration and quote-response validation.
-- Conservative two-leg evaluation using the forward minimum output.
-- Request throttling, bounded response reads, retry handling, and unit tests.
+- Active scans now cancel cleanly on shutdown and stop immediately after denied
+  API access.
+- Rate-limit handling prefers Jupiter's `x-ratelimit-reset` timestamp and
+  supports both delta-seconds and HTTP-date `Retry-After` fallbacks.
+- Quote validation now rejects malformed AMM keys and venues outside an
+  explicitly requested DEX set.
 
 ### Security
 
 - Disabled legacy transaction and deployment paths.
 - Removed hardcoded credential paths and expanded sensitive-file ignores.
 
-[Unreleased]: https://github.com/x89/Solana-Arbitrage-Bot/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/x89/Solana-Arbitrage-Bot/releases/tag/v0.2.0
+[Unreleased]: https://github.com/x89/Solana-Arbitrage-Bot/commits/master

@@ -98,6 +98,7 @@ impl Config {
             bail!("jupiter.base_url must use HTTPS");
         }
         if base_url.host_str() != Some("api.jup.ag")
+            || base_url.port_or_known_default() != Some(443)
             || base_url.path().trim_end_matches('/') != "/swap/v2"
             || !base_url.username().is_empty()
             || base_url.password().is_some()
@@ -106,10 +107,13 @@ impl Config {
         {
             bail!("jupiter.base_url must be the official https://api.jup.ag/swap/v2 endpoint");
         }
-        if !is_trimmed_nonempty(&self.jupiter.api_key_env)
-            || !is_trimmed_nonempty(&self.jupiter.taker_env)
+        if !is_valid_env_name(&self.jupiter.api_key_env)
+            || !is_valid_env_name(&self.jupiter.taker_env)
         {
-            bail!("Jupiter environment-variable names must be nonempty and trimmed");
+            bail!(
+                "Jupiter environment-variable names must be nonempty, trimmed, \
+                 and contain neither '=' nor NUL"
+            );
         }
         if self.jupiter.request_timeout_ms < 100 {
             bail!("jupiter.request_timeout_ms must be at least 100");
@@ -134,6 +138,12 @@ impl Config {
         }
         if !(100..=300_000).contains(&self.scanner.max_cycle_duration_ms) {
             bail!("scanner.max_cycle_duration_ms must be between 100 and 300000");
+        }
+        if self.scanner.max_cycle_duration_ms <= self.jupiter.min_request_interval_ms {
+            bail!(
+                "scanner.max_cycle_duration_ms must be greater than \
+                 jupiter.min_request_interval_ms"
+            );
         }
 
         let enabled_routes: Vec<_> = self.routes.iter().filter(|route| route.enabled).collect();
@@ -175,6 +185,13 @@ impl Config {
 
 fn is_trimmed_nonempty(value: &str) -> bool {
     !value.is_empty() && value.trim() == value
+}
+
+fn is_valid_env_name(value: &str) -> bool {
+    is_trimmed_nonempty(value)
+        && !value
+            .chars()
+            .any(|character| matches!(character, '=' | '\0'))
 }
 
 fn validate_dex_labels(field: &str, route: &str, labels: &[String]) -> Result<()> {
@@ -298,6 +315,17 @@ mod tests {
 
         config.jupiter.base_url = "https://example.com/swap/v2".to_owned();
         assert!(config.validate().is_err());
+
+        config.jupiter.base_url = "https://api.jup.ag:444/swap/v2".to_owned();
+        assert!(config.validate().is_err());
+    }
+
+    #[test]
+    fn rejects_impossible_quote_cycle_timing() {
+        let mut config = valid_config();
+        config.jupiter.min_request_interval_ms = 15_000;
+        config.scanner.max_cycle_duration_ms = 15_000;
+        assert!(config.validate().is_err());
     }
 
     #[test]
@@ -311,6 +339,14 @@ mod tests {
     fn rejects_ambiguous_environment_names_and_dex_labels() {
         let mut config = valid_config();
         config.jupiter.api_key_env = " JUPITER_API_KEY".to_owned();
+        assert!(config.validate().is_err());
+
+        let mut config = valid_config();
+        config.jupiter.api_key_env = "JUPITER=API_KEY".to_owned();
+        assert!(config.validate().is_err());
+
+        let mut config = valid_config();
+        config.jupiter.taker_env = "SOLANA\0TAKER".to_owned();
         assert!(config.validate().is_err());
 
         let mut config = valid_config();
