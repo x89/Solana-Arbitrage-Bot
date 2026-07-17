@@ -1,38 +1,52 @@
 # Solana Arbitrage Monitor
 
-A safety-first, observation-only cyclic-arbitrage monitor for Solana. The
-supported implementation uses Jupiter Swap V2 to evaluate configured
-round-trip routes without loading a private key, signing a transaction, or
-submitting anything on-chain.
+[![CI](https://github.com/x89/Solana-Arbitrage-Bot/actions/workflows/ci.yml/badge.svg)](https://github.com/x89/Solana-Arbitrage-Bot/actions/workflows/ci.yml)
+[![Rust 1.89+](https://img.shields.io/badge/rust-1.89%2B-orange.svg)](rust-toolchain.toml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> **Project status — 15 July 2026**
->
-> `solana-mev` is the only maintained and supported component. It is suitable
-> for quote monitoring and engineering research, not funded execution. The
-> other workspaces are archived prototypes with obsolete protocol integrations
-> and must not be deployed or funded.
+A production-minded, observation-only service for evaluating configured
+cyclic-arbitrage routes on Solana through Jupiter Swap V2. It discovers and
+scores round trips without loading private keys, connecting to Solana RPC, or
+submitting transactions.
+
+> [!IMPORTANT]
+> **Supported scope — 17 July 2026:** `solana-mev` is the repository's only
+> maintained product. It is a quote monitor for research and operational
+> telemetry—not a trading engine. Everything under `legacy/` is archived,
+> excluded from CI and releases, and unsafe for funded use.
+
+## At a glance
+
+| Area | Current contract |
+| --- | --- |
+| Product | Read-only two-leg cyclic-arbitrage monitor |
+| Market access | Jupiter Swap V2 `/build` quotes |
+| Execution | Intentionally absent |
+| Credentials | Jupiter API key plus an unfunded public taker address |
+| Runtime | Rust 1.89+, Tokio, rustls |
+| Output | Human-readable or newline-delimited JSON logs |
+| Quality | 20 deterministic tests, strict Clippy, RustSec and cargo-deny |
+| Release pipeline | Signed-tag builds for Linux x86-64 and Apple Silicon macOS |
 
 ## Contents
 
-- [What this project does](#what-this-project-does)
+- [Supported product](#supported-product)
 - [Safety boundary](#safety-boundary)
 - [Architecture](#architecture)
 - [Opportunity calculation](#opportunity-calculation)
-- [Repository layout](#repository-layout)
-- [Requirements](#requirements)
 - [Quick start](#quick-start)
 - [Configuration](#configuration)
-- [Running the monitor](#running-the-monitor)
-- [Understanding the output](#understanding-the-output)
+- [Operating the monitor](#operating-the-monitor)
 - [Reliability and security controls](#reliability-and-security-controls)
-- [Verification](#verification)
+- [Engineering workflow](#engineering-workflow)
 - [Operations and releases](#operations-and-releases)
+- [Repository layout](#repository-layout)
 - [Known limitations](#known-limitations)
 - [Legacy workspaces](#legacy-workspaces)
-- [Path to transaction execution](#path-to-transaction-execution)
+- [Execution roadmap](#execution-roadmap)
 - [Troubleshooting](#troubleshooting)
 
-## What this project does
+## Supported product
 
 For each enabled route, the monitor:
 
@@ -50,9 +64,10 @@ For each enabled route, the monitor:
    freshness deadline.
 8. Logs either a normal route evaluation or a candidate opportunity.
 
-The monitor uses the current Jupiter `/swap/v2/build` response for routing
-information. Although that endpoint also returns transaction instructions, this
-project deliberately ignores those instructions and performs no execution.
+The implementation is deliberately narrow: route discovery and conservative
+evaluation are supported; transaction construction and execution are not.
+Jupiter's `/swap/v2/build` response is treated as untrusted input and validated
+before any value contributes to an opportunity decision.
 
 ## Safety boundary
 
@@ -78,18 +93,34 @@ sequenceDiagram
     participant Jupiter as Jupiter Swap V2
 
     Operator->>Monitor: Start with config and environment variables
-    Monitor->>Monitor: Validate endpoint, addresses, limits, and routes
+    Monitor->>Monitor: Validate schema, endpoint, addresses, limits, routes
+    Monitor->>Monitor: Wait for shared request slot
     Monitor->>Jupiter: Build forward quote (start → intermediate)
     Jupiter-->>Monitor: Expected and minimum forward output + route plan
-    Monitor->>Monitor: Apply global request-rate gate
+    Monitor->>Monitor: Validate response and wait for shared request slot
     Monitor->>Jupiter: Build return quote using minimum forward output
     Jupiter-->>Monitor: Expected and minimum final output + route plan
-    Monitor->>Monitor: Subtract estimated costs and test profit threshold
-    Monitor-->>Operator: Log evaluation or candidate opportunity
+    Monitor->>Monitor: Validate continuity, freshness, venues, costs, threshold
+    Monitor-->>Operator: Emit evaluation, candidate, error, and scan summary
 ```
 
 The monitor evaluates routes sequentially. All Jupiter requests share one
 request gate, so adding routes does not bypass the configured API-rate limit.
+Each route is failure-isolated except for denied API access (`401`/`403`),
+which stops the active scan immediately.
+
+### Design decisions
+
+- **Conservative composition:** the return leg consumes the forward leg's
+  minimum output, not its optimistic quote.
+- **Integer economics:** all amounts and threshold comparisons use base-unit
+  integer arithmetic.
+- **Strict boundaries:** unknown configuration fields, non-official endpoints,
+  malformed AMM keys, and out-of-policy DEX responses fail closed.
+- **Deterministic testability:** Jupiter transport and quote evaluation are
+  exercised with local mocks and fake providers; tests never require mainnet.
+- **Operational transparency:** each event carries scan context, and each pass
+  ends with a structured summary.
 
 ## Opportunity calculation
 
@@ -127,52 +158,49 @@ is still only a sequential quote estimate. Market movement between requests,
 transaction fees, account state changes, and transaction construction can make
 the real result materially different.
 
-## Repository layout
+## Quick start
 
-- `solana-mev/` — maintained Rust monitor and the only supported runnable
-  component.
-- `Cargo.toml`, `Cargo.lock`, and `rust-toolchain.toml` — reproducible root
-  workspace containing only the maintained monitor.
-- `.github/` — CI, dependency updates, review ownership, issue forms, and
-  attested release automation.
-- `MIGRATION.md` — dated protocol, dependency, and migration findings.
-- `legacy/` — excluded historical clients, Anchor programs, and uncompiled
-  prototypes.
-- `docs/legacy/` — obsolete conceptual diagrams retained for archaeology.
-
-## Requirements
+### Prerequisites
 
 - `rustup`; the repository pins Rust 1.89.0 with rustfmt and Clippy.
 - A Jupiter API key from <https://portal.jup.ag>.
-- A valid public Solana wallet address for Jupiter's required `taker`
-  parameter.
+- An unfunded public Solana address for Jupiter's required `taker` parameter.
 - Internet access to `https://api.jup.ag`.
 
 Anchor, the Solana CLI, a Solana RPC URL, and a funded wallet are not required
 for the supported monitor.
 
-## Quick start
+### Validate and run one scan
+
+Run commands from the repository root:
 
 ```bash
 export JUPITER_API_KEY="your-jupiter-api-key"
 export SOLANA_TAKER_PUBKEY="your-public-solana-address"
+
+cargo run --package mev-bot-solana -- \
+  --config solana-mev/config.toml --validate-config
 
 cargo run --release --package mev-bot-solana -- \
   --config solana-mev/config.toml --once
 ```
 
-The `--once` command evaluates every enabled route once and exits. It returns a
-non-zero status if a route evaluation fails, making it suitable for manual
-checks and controlled automation.
+Configuration validation does not read credentials or call Jupiter. `--once`
+evaluates every enabled route once and returns non-zero if any route fails.
 
-For continuous monitoring:
+### Run continuously
 
 ```bash
 export JUPITER_API_KEY="your-jupiter-api-key"
 export SOLANA_TAKER_PUBKEY="your-public-solana-address"
+
 cargo run --release --package mev-bot-solana -- \
   --config solana-mev/config.toml
 ```
+
+The application does not load `.env` files automatically. Inject environment
+variables through the shell, service manager, container runtime, or secret
+manager.
 
 ## Configuration
 
@@ -192,181 +220,55 @@ cargo run --package mev-bot-solana -- \
 
 ### Jupiter settings
 
-`base_url`
-
-- Must be the official `https://api.jup.ag/swap/v2` endpoint.
-- Credentials, query strings, fragments, alternate hosts, and non-HTTPS URLs
-  are rejected.
-
-`api_key_env`
-
-- Name of the environment variable containing the Jupiter API key.
-- Defaults to `JUPITER_API_KEY`.
-- The secret itself must never be written to the TOML file.
-
-`taker_env`
-
-- Name of the environment variable containing the public Solana taker address.
-- Defaults to `SOLANA_TAKER_PUBKEY`.
-
-`request_timeout_ms`
-
-- Timeout for each Jupiter HTTP request.
-- Allowed range: `100` through `60000` milliseconds.
-- Default: `5000`.
-
-`min_request_interval_ms`
-
-- Minimum delay between the start of any two Jupiter requests.
-- Shared across every route and both quote legs.
-- Default: `1100`, which is intended to remain below Jupiter Free's documented
-  one-request-per-second limit.
-- Paid plans may use a lower value consistent with their portal quota.
-- Maximum accepted value: `60000`.
+| Field | Default | Contract |
+| --- | --- | --- |
+| `base_url` | Official Swap V2 URL | Must use the official `https://api.jup.ag/swap/v2` origin and path; alternate hosts or ports, credentials, query strings, fragments, and non-HTTPS URLs are rejected. |
+| `api_key_env` | `JUPITER_API_KEY` | Environment-variable name containing the API key. Never place the key itself in TOML. |
+| `taker_env` | `SOLANA_TAKER_PUBKEY` | Environment-variable name containing an unfunded public Solana address. |
+| `request_timeout_ms` | `5000` | Per-request timeout; accepted range `100..=60000`. |
+| `min_request_interval_ms` | `1100` | Shared delay between request starts; accepted range `0..=60000`. Set this from the quota shown in the Jupiter portal. |
 
 ### Scanner settings
 
-`interval_ms`
-
-- Delay after a completed scan before the next scan begins.
-- This is separate from the per-request Jupiter rate gate.
-- Minimum: `100`.
-- Default: `1000`.
-
-`min_profit_bps`
-
-- Minimum estimated net profit in basis points.
-- `30` means `0.30%`.
-- Allowed range: `0` through `10000`.
-- Net profit must still be strictly positive when this value is zero.
-
-`slippage_bps`
-
-- Slippage tolerance sent to each Jupiter quote request.
-- `30` means `0.30%`.
-- Must be less than `10000`.
-
-`max_accounts`
-
-- Maximum account count requested from Jupiter for a route.
-- Allowed range: `1` through `64`.
-
-`fast_mode`
-
-- Sends `mode=fast` to Jupiter when enabled.
-- Default: `true`.
-
-`require_different_venues`
-
-- Requires disjoint `ammKey` sets between the forward and return legs.
-- This reduces obvious self-reuse of the same liquidity source.
-- It does not prove that the routes are economically independent.
-
-`max_cycle_duration_ms`
-
-- Maximum wall-clock age of the complete forward-and-return quote cycle.
-- A cycle that reaches this deadline is cancelled and cannot become a
-  candidate.
-- Must be greater than `jupiter.min_request_interval_ms`.
-- Allowed range: `100` through `300000`; default: `15000`.
+| Field | Default | Contract |
+| --- | --- | --- |
+| `interval_ms` | `1000` | Delay after a completed scan; minimum `100`. |
+| `min_profit_bps` | `30` | Required estimated net profit (`30` = `0.30%`); range `0..=10000`. Profit must remain strictly positive at zero. |
+| `slippage_bps` | `30` | Slippage sent to both quote requests; must be below `10000`. |
+| `max_accounts` | `64` | Jupiter route-account limit; range `1..=64`. |
+| `fast_mode` | `true` | Sends `mode=fast` to Jupiter. |
+| `require_different_venues` | `true` | Requires disjoint forward and return `ammKey` sets. This is a filter, not proof of economic independence. |
+| `max_cycle_duration_ms` | `15000` | Cancels stale quote cycles; range `100..=300000` and must exceed `min_request_interval_ms`. |
 
 ### Route settings
 
 Each `[[routes]]` block defines one cycle:
 
-`name`
+| Field | Contract |
+| --- | --- |
+| `name` | Unique, non-empty, trimmed identifier used in logs. |
+| `start_mint` | Asset supplied at the start and expected after the return leg. |
+| `intermediate_mint` | Asset between the two legs; must differ from `start_mint`. |
+| `amount` | Positive integer in start-mint base units. For six-decimal USDC, `100000000` means 100 USDC. |
+| `estimated_cost_in_start_units` | Manual cost allowance in start-mint base units; must be below `amount`. Include realistic priority fees, tips, transfer fees, rent, and wrapping costs. |
+| `forward_dexes`, `return_dexes` | Optional exact Jupiter DEX labels. Empty arrays allow any supported venue. |
+| `enabled` | Includes the route in scans. At least one route must be enabled. |
 
-- Unique, non-empty, whitespace-trimmed identifier used in logs.
+The maintained, commented example is
+[`solana-mev/config.toml`](solana-mev/config.toml). Treat cost allowances as
+operator assumptions, not guarantees.
 
-`start_mint`
+## Operating the monitor
 
-- Solana mint address of the asset supplied at the start and expected at the
-  end of the cycle.
+### Command reference
 
-`intermediate_mint`
-
-- Solana mint address quoted between the two legs.
-- Must differ from `start_mint`.
-
-`amount`
-
-- Positive integer amount in the start mint's smallest unit.
-- Example: USDC has six decimals, so `100000000` represents 100 USDC.
-
-`estimated_cost_in_start_units`
-
-- Estimated total execution cost expressed in the start mint's smallest unit.
-- Must be smaller than `amount`.
-- It should account for realistic priority fees, Jito tips, Token-2022
-  transfer fees, ATA rent, wrapping/unwrapping costs, and other execution
-  overhead.
-- This is an operator estimate, not a safety guarantee.
-
-`forward_dexes` and `return_dexes`
-
-- Optional lists of exact Jupiter DEX labels.
-- Empty lists allow Jupiter to use any supported venue.
-- Values must be non-empty, trimmed, unique, and must not contain commas.
-
-`enabled`
-
-- Controls whether the route is evaluated.
-- At least one route must be enabled.
-
-Example:
-
-```toml
-schema_version = 1
-
-[jupiter]
-base_url = "https://api.jup.ag/swap/v2"
-api_key_env = "JUPITER_API_KEY"
-taker_env = "SOLANA_TAKER_PUBKEY"
-request_timeout_ms = 5000
-min_request_interval_ms = 1100
-
-[scanner]
-interval_ms = 1000
-min_profit_bps = 30
-slippage_bps = 30
-max_accounts = 64
-fast_mode = true
-require_different_venues = true
-max_cycle_duration_ms = 15000
-
-[[routes]]
-name = "USDC-WSOL-USDC"
-start_mint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-intermediate_mint = "So11111111111111111111111111111111111111112"
-amount = 100000000
-estimated_cost_in_start_units = 10000
-forward_dexes = []
-return_dexes = []
-enabled = true
-```
-
-## Running the monitor
-
-Run once with the default configuration:
-
-```bash
-cargo run --release --package mev-bot-solana -- \
-  --config solana-mev/config.toml --once
-```
-
-Use a different configuration:
-
-```bash
-cargo run --release --package mev-bot-solana -- \
-  --config /absolute/path/to/config.toml --once
-```
-
-Run continuously:
-
-```bash
-cargo run --release --package mev-bot-solana -- \
-  --config solana-mev/config.toml
-```
+| Option | Behavior |
+| --- | --- |
+| `--config <PATH>` | Loads a specific TOML file. The CLI default is `config.toml` relative to the current directory. |
+| `--validate-config` | Validates TOML without credentials or network access. |
+| `--once` | Evaluates each enabled route once and exits. |
+| `--log-format human` | Emits terminal-oriented tracing output. |
+| `--log-format json` | Emits newline-delimited structured events. |
 
 Enable request-level diagnostic logging:
 
@@ -388,32 +290,19 @@ Display command-line help:
 cargo run --package mev-bot-solana -- --help
 ```
 
-## Understanding the output
+### Event model
 
-Normal evaluations are logged at `INFO` level and include:
+The logging contract is identical in human and JSON modes:
 
-- scan identifier and quote-cycle duration;
-- route name;
-- estimated profit in basis points;
-- minimum final amount;
-- forward and return DEX labels;
-- whether the underlying `ammKey` sets are disjoint.
+| Event | Level | Key fields |
+| --- | --- | --- |
+| Route evaluation | `INFO` | `scan_id`, route, profit basis points, minimum final amount, venues, cycle duration |
+| Candidate opportunity | `WARN` | Evaluation fields plus start amount, expected/minimum intermediate and final amounts, estimated net profit |
+| Route failure | `ERROR` | `scan_id`, route, and complete contextual error chain |
+| Scan summary | `INFO` | Route, error, candidate, and elapsed-time counts |
 
-Candidate opportunities are logged at `WARN` level and additionally include:
-
-- start amount;
-- expected and minimum intermediate amounts;
-- expected and minimum final amounts;
-- estimated net profit in start-mint base units.
-
-Request or schema failures are logged at `ERROR` level with their full error
-cause chain. A candidate log means only that two sequential API responses
-satisfied the configured rules. It is not an execution recommendation or
-profit guarantee.
-
-Every pass ends with a structured scan summary containing route, error,
-candidate, and elapsed-time counts. Human and JSON formats carry the same
-fields.
+Logs never include the Jupiter API key. Treat candidate events as telemetry,
+not orders, recommendations, or profit guarantees.
 
 ## Reliability and security controls
 
@@ -445,9 +334,10 @@ The maintained monitor includes the following safeguards:
   license/source policy, changed commits for secrets, and the full repository
   history on a weekly or manually triggered scan.
 
-## Verification
+## Engineering workflow
 
-From the repository root:
+The root workspace contains only the supported crate. Before opening a pull
+request, run:
 
 ```bash
 cargo fmt --all -- --check
@@ -465,12 +355,13 @@ cargo install cargo-deny --locked
 cargo deny check
 ```
 
-As of 2026-07-15:
+Verified on 17 July 2026:
 
 - formatting passes;
-- all targets and features compile;
+- all targets and features compile on Rust 1.89 and latest stable;
 - 13 unit tests and 7 deterministic integration tests pass;
 - strict Clippy passes with warnings denied;
+- rustdoc and optimized release builds pass;
 - the supported workspace lockfile has no RustSec vulnerabilities.
 
 Integration tests use a local mock HTTP server and a fake quote provider. They
@@ -482,6 +373,10 @@ without depending on live mainnet state.
 These checks validate the off-chain monitor only. They do not certify that a
 candidate is executable, validate mainnet liquidity, or make the archived CPI
 programs safe.
+
+Contribution policy, required checks, and scope rules are documented in
+[`CONTRIBUTING.md`](CONTRIBUTING.md). Security issues must follow
+[`SECURITY.md`](SECURITY.md).
 
 ## Operations and releases
 
@@ -495,6 +390,28 @@ Signed tags matching `v<crate-version>` on the default branch build Linux
 x86-64 and Apple Silicon macOS archives. The release workflow reruns quality
 gates, publishes SHA-256 checksums and GitHub build-provenance attestations, and
 rejects a tag that does not match the Cargo package version.
+
+Release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md). The complete
+deployment, health, shutdown, rollback, and release procedure is in
+[`docs/OPERATIONS.md`](docs/OPERATIONS.md).
+
+## Repository layout
+
+```text
+.
+├── solana-mev/          # Supported Rust monitor, configuration, and tests
+├── docs/                # Operations and archived design material
+├── legacy/              # Quarantined historical prototypes
+├── .github/             # CI, release, ownership, and dependency automation
+├── Cargo.toml           # Root workspace: solana-mev only
+├── Cargo.lock           # Reproducible supported dependency graph
+├── rust-toolchain.toml  # Rust 1.89, rustfmt, and Clippy
+├── MIGRATION.md         # Dated protocol and dependency findings
+└── SECURITY.md          # Supported surface and disclosure policy
+```
+
+The workspace boundary is intentional. Cargo commands from the repository root
+do not build or test archived manifests.
 
 ## Known limitations
 
@@ -549,10 +466,10 @@ The legacy Rust and Node lockfiles contain known security advisories. Updating
 individual transitive packages cannot repair obsolete protocol semantics. See
 [`MIGRATION.md`](MIGRATION.md) for the detailed findings.
 
-## Path to transaction execution
+## Execution roadmap
 
-Funded execution should be implemented as a separate, explicitly reviewed
-milestone. At minimum, it must:
+Funded execution is a separate product and security boundary, not a feature
+toggle for this monitor. A future executor would require, at minimum:
 
 1. Consume current protocol-returned instructions and address lookup tables.
 2. Compose both legs into one versioned transaction.
