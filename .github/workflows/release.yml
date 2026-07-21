@@ -53,10 +53,11 @@ jobs:
           cargo +1.89.0 test --workspace --all-targets --all-features --locked
           cargo +1.89.0 clippy --workspace --all-targets --all-features --locked -- -D warnings
 
+      - name: Install cargo-audit
+        run: cargo +1.89.0 install cargo-audit --locked
+
       - name: Run release RustSec audit
-        uses: rustsec/audit-check@69366f33c96575abad1ee0dba8212993eecbe998 # v2.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+        run: cargo +1.89.0 audit --file Cargo.lock
 
       - name: Run release dependency policy
         uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2.1.1

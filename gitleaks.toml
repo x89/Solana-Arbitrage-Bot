@@ -1,0 +1,60 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Ignore documented placeholder API keys in maintained docs."
+condition = "AND"
+regexTarget = "line"
+paths = [
+  '''^README\.md$''',
+  '''^solana-mev/README\.md$''',
+]
+regexes = [
+  '''export JUPITER_API_KEY="your-jupiter-api-key"''',
+  '''export JUPITER_API_KEY="\.\.\."''',
+]
+
+[[allowlists]]
+description = "Ignore test fixtures for Jupiter API-key handling."
+condition = "AND"
+regexTarget = "line"
+paths = [
+  '''^solana-mev/src/jupiter\.rs$''',
+  '''^solana-mev/src/main\.rs$''',
+  '''^solana-mev/tests/jupiter_client\.rs$''',
+]
+regexes = [
+  '''test-api-key''',
+  '''x-api-key''',
+]
+
+[[allowlists]]
+description = "Ignore GitHub Actions token expressions in workflow definitions."
+condition = "AND"
+regexTarget = "line"
+paths = [
+  '''^\.github/workflows/ci\.yml$''',
+  '''^\.github/workflows/release\.yml$''',
+]
+regexes = [
+  '''\$\{\{\s*github\.token\s*\}\}''',
+  '''\$\{\{\s*secrets\.GITHUB_TOKEN\s*\}\}''',
+]
+
+[[allowlists]]
+description = "Ignore well-known public Solana addresses in tests and examples."
+condition = "AND"
+regexTarget = "line"
+paths = [
+  '''^solana-mev/config\.toml$''',
+  '''^solana-mev/src/config\.rs$''',
+  '''^solana-mev/src/jupiter\.rs$''',
+  '''^solana-mev/src/main\.rs$''',
+  '''^solana-mev/tests/jupiter_client\.rs$''',
+  '''^solana-mev/tests/scanner_integration\.rs$''',
+]
+regexes = [
+  '''\b11111111111111111111111111111111\b''',
+  '''\bSo11111111111111111111111111111111111111112\b''',
+  '''\bEPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v\b''',
+]
